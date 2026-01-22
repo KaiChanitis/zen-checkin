@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>禪修班雲端管理系統</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; }
+        .card { background: var(--card); max-width: 500px; margin: 10px auto; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; }
+        
+        .status-bar { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 15px; height: 18px; }
+        
+        .control-group { background: #f1f5f9; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        label { display: block; font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 5px; }
+        select { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; font-size: 16px; outline: none; transition: border 0.2s; }
+        select:focus { border-color: var(--primary); }
+
+        .member-list { margin-top: 10px; }
+        .member-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid #f1f5f9; }
+        .member-info { flex: 1; }
+        .member-name { font-size: 17px; font-weight: 600; color: #334155; }
+        .member-dharma { color: var(--primary); font-size: 15px; margin-left: 4px; }
+        .member-group { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+        .item-select { width: auto; min-width: 120px; padding: 6px; font-size: 14px; margin-bottom: 0; }
+        
+        .loading-overlay { text-align: center; padding: 40px; color: #64748b; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; background: #e0e7ff; color: #4338ca; font-size: 11px; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2 id="activityTitle">活動點名載入中...</h2>
+    <div id="statusMsg" class="status-bar">正在連線至雲端資料庫...</div>
+
+    <div class="control-group">
+        <label>選擇目前活動：</label>
+        <select id="eventSelect" onchange="render()"></select>
+
+        <label>篩選組別：</label>
+        <select id="groupSelect" onchange="render()">
+            <option value="全部">全部顯示</option>
+            <option value="第一組">第一組</option>
+            <option value="第二組">第二組</option>
+            <option value="第三組">第三組</option>
+            <option value="第四組">第四組</option>
+            <option value="第五組">第五組</option>
+        </select>
+    </div>
+
+    <div id="loading" class="loading-overlay">讀取名單中，請稍候...</div>
+    <div id="memberContainer" class="member-list"></div>
+</div>
+
+<script>
+    // --- ⚠️ 重要：請在下方填入您的 Google Apps Script 部署網址 ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbxrrCkL3c7SnVn7LDqmN9yUH4SvjWcdbPW-rkjbem_gRfYRiSIMunP8uwudm_fkAnN5/exec";
+    // -------------------------------------------------------
+
+    let rawData = [];
+    let eventConfigs = [];
+
+    // 初始化讀取資料
+    async function init() {
+        try {
+            const res = await fetch(API_URL);
+            const json = await res.json();
+            
+            rawData = json.members;   // 試算表完整陣列
+            eventConfigs = json.events; // 活動設定陣列
+
+            // 填充活動選單
+            const evSel = document.getElementById('eventSelect');
+            evSel.innerHTML = '';
+            eventConfigs.forEach(ev => {
+                let opt = document.createElement('option');
+                opt.value = ev.name;
+                opt.innerText = ev.name;
+                evSel.appendChild(opt);
+            });
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('statusMsg').innerText = "✅ 同步成功";
+            render();
+        } catch (e) {
+            document.getElementById('statusMsg').innerText = "❌ 連線失敗，請檢查網址與分頁名稱";
+            console.error(e);
+        }
+    }
+
+    // 渲染名單
+    function render() {
+        const container = document.getElementById('memberContainer');
+        const currentEvent = document.getElementById('eventSelect').value;
+        const currentGroup = document.getElementById('groupSelect').value;
+        
+        // 找到該活動對應的選項設定
+        const config = eventConfigs.find(e => e.name === currentEvent);
+        
+        // 取得標題列來定位欄位
+        const headers = rawData[0];
+        const eventColIndex = headers.indexOf(currentEvent);
+        
+        document.getElementById('activityTitle').innerText = currentEvent;
+        container.innerHTML = '';
+
+        // 從第 2 列 (index 1) 開始遍歷
+        for(let i = 1; i < rawData.length; i++) {
+            const row = rawData[i];
+            const group = row[0];      // A欄：組別
+            const name = row[1];       // B欄：姓名
+            const dharmaName = row[2]; // C欄：法名
+            const currentStatus = row[eventColIndex]; // 動態活動欄位
+
+            if (currentGroup === "全部" || group === currentGroup) {
+                const div = document.createElement('div');
+                div.className = 'member-item';
+                
+                // 動態產生該活動的選項列表
+                let optionsHTML = config.options.map(opt => 
+                    `<option value="${opt}" ${currentStatus === opt ? 'selected' : ''}>${opt}</option>`
+                ).join('');
+
+                div.innerHTML = `
+                    <div class="member-info">
+                        <div class="badge">${group}</div>
+                        <div>
+                            <span class="member-name">${name}</span>
+                            <span class="member-dharma">(${dharmaName || '無法名'})</span>
+                        </div>
+                    </div>
+                    <select class="item-select" onchange="update('${name}', '${currentEvent}', this.value, this)">
+                        ${optionsHTML}
+                    </select>
+                `;
+                container.appendChild(div);
+            }
+        }
+    }
+
+    // 更新回傳 Google 試算表
+    async function update(name, eventName, newVal, element) {
+        element.style.borderColor = "#fbbf24";
+        document.getElementById('statusMsg').innerText = `正在同步 ${name} 的狀態...`;
+
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    name: name,
+                    event: eventName,
+                    status: newVal
+                })
+            });
+            
+            // 由於 no-cors 模式，我們模擬延遲顯示成功
+            setTimeout(() => {
+                element.style.borderColor = "#10b981";
+                document.getElementById('statusMsg').innerText = `✅ ${name} 更新成功`;
+            }, 600);
+        } catch (e) {
+            alert('連線不穩定，更新可能未成功');
+            element.style.borderColor = "#ef4444";
+        }
+    }
+
+    // 啟動
+    init();
+</script>
+
+</body>
+</html>
