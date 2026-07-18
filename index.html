@@ -6,53 +6,128 @@
     <title>禪修班雲端管理系統</title>
     <style>
         :root {
-            --primary: #4f46e5;
-            --bg: #f8fafc;
+            /* 調整為沉穩優雅的禪風翡翠綠與大地色系 */
+            --primary: #2d6a4f; 
+            --primary-light: #d8f3dc;
+            --bg: #f4f6f4;
             --card: #ffffff;
-            --text: #1e293b;
+            --text: #2f3e46;
+            --text-light: #6c757d;
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; }
-        .card { background: var(--card); max-width: 500px; margin: 10px auto; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; }
-        .status-bar { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 15px; height: 18px; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            padding: 15px; 
+            margin: 0; 
+        }
+        .card { 
+            background: var(--card); 
+            max-width: 500px; 
+            margin: 10px auto; 
+            padding: 25px 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.06); 
+        }
+        h2 { text-align: center; color: var(--primary); margin-top: 5px; margin-bottom: 5px; font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; }
+        .status-bar { text-align: center; font-size: 12px; color: var(--text-light); margin-bottom: 20px; height: 18px; font-weight: 500; }
         
-        /* 新增：統計看板樣式 */
-        .stats-badge-group { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 15px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1; }
-        .stat-item { flex: 1; text-align: center; font-size: 13px; color: #475569; }
-        .stat-item strong { display: block; font-size: 18px; color: #1e293b; margin-top: 2px; }
+        /* 優化：現代化幾何數據統計看板 */
+        .stats-badge-group { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        .stat-item { 
+            flex: 1; 
+            text-align: center; 
+            font-size: 11px; 
+            color: var(--text-light); 
+            background: #ffffff;
+            padding: 8px 5px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid #eef1f0;
+        }
+        .stat-item strong { 
+            display: block; 
+            font-size: 18px; 
+            color: #1e293b; 
+            margin-top: 4px; 
+            font-weight: 700;
+        }
 
-        .control-group { background: #f1f5f9; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
-        label { display: block; font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 5px; }
-        select { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; font-size: 16px; outline: none; }
+        .control-group { background: #eaefec; padding: 15px; border-radius: 14px; margin-bottom: 20px; border: 1px solid #dee5e2; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; }
+        select { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 12px; 
+            border-radius: 10px; 
+            border: 1px solid #cbd5e1; 
+            background: white; 
+            font-size: 15px; 
+            outline: none; 
+            color: var(--text);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+        }
+        select:last-child { margin-bottom: 0; }
         
-        .member-item { display: flex; flex-direction: column; padding: 15px 10px; border-bottom: 1px solid #f1f5f9; }
-        .member-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .member-name { font-size: 17px; font-weight: 600; color: #334155; }
-        .member-dharma { color: var(--primary) !important; font-size: 15px; margin-left: 4px; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; background: #e0e7ff; color: #4338ca; font-size: 11px; }
+        /* 優化：名單條目與排版 */
+        .member-item { 
+            display: flex; 
+            flex-direction: column; 
+            padding: 16px 8px; 
+            border-bottom: 1px solid #edf2f0; 
+        }
+        .member-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .member-name { font-size: 17px; font-weight: 600; color: #222e35; letter-spacing: 0.5px; }
         
+        /* 優化：法名改為精緻的小標籤 */
+        .member-dharma { 
+            color: var(--primary); 
+            font-size: 12px; 
+            margin-left: 6px; 
+            background: var(--primary-light);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #f0f4f1; color: #52796f; font-size: 11px; font-weight: 500; border: 1px solid #e1e8e4; }
+        
+        /* 優化：極具質感的點名按鈕群組 */
         .btn-group { display: flex; gap: 8px; width: 100%; }
         .status-btn { 
             flex: 1; 
-            padding: 10px 5px; 
+            padding: 11px 5px; 
             font-size: 14px; 
             font-weight: 500; 
-            border: 1px solid #cbd5e1; 
-            background: white; 
-            border-radius: 8px; 
+            border: 1px solid #d8e2dc; 
+            background: #ffffff; 
+            color: var(--text-light);
+            border-radius: 10px; 
             cursor: pointer; 
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             -webkit-tap-highlight-color: transparent;
         }
         
-        .status-btn.active[data-val="參加"] { background: #dcfce7; color: #15803d; border-color: #86efac; font-weight: 600; }
-        .status-btn.active[data-val="不參加"] { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; font-weight: 600; }
-        .status-btn.active[data-val="請假"] { background: #fef3c7; color: #b45309; border-color: #fde68a; font-weight: 600; }
-        .status-btn.active { background: #e0e7ff; color: #4338ca; border-color: #a5b4fc; font-weight: 600; }
+        /* 亮起狀態：加入微內陰影與高質感色彩 */
+        .status-btn.active[data-val="參加"] { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; font-weight: 600; box-shadow: inset 0 2px 4px rgba(46,125,50,0.1); }
+        .status-btn.active[data-val="不參加"] { background: #ffebee; color: #c62828; border-color: #ef9a9a; font-weight: 600; box-shadow: inset 0 2px 4px rgba(198,40,40,0.1); }
+        .status-btn.active[data-val="請假"] { background: #fff8e1; color: #ef6c00; border-color: #ffe082; font-weight: 600; box-shadow: inset 0 2px 4px rgba(239,108,0,0.1); }
+        .status-btn.active { background: #e8eaf6; color: #283593; border-color: #9fa8da; font-weight: 600; box-shadow: inset 0 2px 4px rgba(40,53,147,0.1); }
         
-        .status-btn.syncing { background: #fef3c7 !important; border-color: #fbbf24 !important; color: #d97706 !important; }
-        .loading-overlay { text-align: center; padding: 40px; color: #64748b; }
+        .status-btn.syncing { background: #fff8e1 !important; border-color: #ffe082 !important; color: #ef6c00 !important; animation: pulse 1s infinite alternate; }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .loading-overlay { text-align: center; padding: 40px; color: var(--text-light); font-size: 14px; }
     </style>
 </head>
 <body>
@@ -61,12 +136,12 @@
     <h2 id="activityTitle">活動點名載入中...</h2>
     <div id="statusMsg" class="status-bar">正在連線至雲端資料庫...</div>
 
-    <!-- 新增：頂端即時數據看板 -->
+    <!-- 數據看板美化版 -->
     <div class="stats-badge-group">
         <div class="stat-item">總人數<strong id="statTotal">0</strong></div>
-        <div class="stat-item" style="color: #16a34a;">參加<strong id="statYes">0</strong></div>
-        <div class="stat-item" style="color: #dc2626;">不參加<strong id="statNo">0</strong></div>
-        <div class="stat-item" style="color: #d97706;">請假/未點<strong id="statOther">0</strong></div>
+        <div class="stat-item" style="border-top: 3px solid #2e7d32;">參加<strong id="statYes">0</strong></div>
+        <div class="stat-item" style="border-top: 3px solid #c62828;">不參加<strong id="statNo">0</strong></div>
+        <div class="stat-item" style="border-top: 3px solid #ef6c00;">請假/未點<strong id="statOther">0</strong></div>
     </div>
 
     <div class="control-group">
@@ -89,7 +164,7 @@
         </select>
     </div>
 
-    <div id="loading" class="loading-overlay">讀取名單中，請稍候...</div>
+    <div id="loading" class="loading-overlay">🍵 靜心讀取名單中，請稍候...</div>
     <div id="memberContainer" class="member-list"></div>
 </div>
 
@@ -115,10 +190,10 @@
             });
 
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('statusMsg').innerText = "✅ 同步成功";
+            document.getElementById('statusMsg').innerText = "● 雲端資料庫同步成功";
             render();
         } catch (e) {
-            document.getElementById('statusMsg').innerText = "❌ 連線失敗";
+            document.getElementById('statusMsg').innerText = "❌ 連線失敗，請檢查網路";
         }
     }
 
@@ -133,11 +208,7 @@
         document.getElementById('activityTitle').innerText = currentEvent;
         container.innerHTML = '';
 
-        // 統計計數器
-        let totalCount = 0;
-        let yesCount = 0;
-        let noCount = 0;
-        let otherCount = 0;
+        let totalCount = 0, yesCount = 0, noCount = 0, otherCount = 0;
 
         for(let i = 1; i < rawData.length; i++) {
             const row = rawData[i];
@@ -146,13 +217,11 @@
             const dharmaName = row[2];
             const currentStatus = (row[eventColIndex] || '').trim();
 
-            // 如果符合篩選條件，納入計算與渲染
             if (currentGroup === "全部" || group === currentGroup) {
                 totalCount++;
                 if (currentStatus === "參加") yesCount++;
                 else if (currentStatus === "不參加") noCount++;
-                else if (currentStatus === "請假" || currentStatus === "" || currentStatus === "請選擇") otherCount++;
-                else otherCount++; // 其他自訂狀態
+                else otherCount++;
 
                 const div = document.createElement('div');
                 div.className = 'member-item';
@@ -162,11 +231,14 @@
                     return `<button class="status-btn ${isActive}" data-val="${opt}" onclick="update('${name}', '${currentEvent}', '${opt}', this)">${opt}</button>`;
                 }).join('');
 
+                // 優化：法名包裝成小 tag 標籤
+                const dharmaHTML = dharmaName ? `<span class="member-dharma">${dharmaName}</span>` : '';
+
                 div.innerHTML = `
                     <div class="member-header">
                         <div>
                             <span class="member-name">${name}</span>
-                            <span class="member-dharma">(${dharmaName || '無法名'})</span>
+                            ${dharmaHTML}
                         </div>
                         <div class="badge">${group}</div>
                     </div>
@@ -178,7 +250,6 @@
             }
         }
 
-        // 更新頂端看板數字
         document.getElementById('statTotal').innerText = totalCount;
         document.getElementById('statYes').innerText = yesCount;
         document.getElementById('statNo').innerText = noCount;
@@ -193,7 +264,7 @@
         
         allBtns.forEach(btn => btn.classList.remove('active'));
         clickedBtn.classList.add('syncing');
-        document.getElementById('statusMsg').innerText = `正在更新 ${name} 👉 ${newVal}...`;
+        document.getElementById('statusMsg').innerText = `正在更新 ${name} 至【${newVal}】...`;
 
         try {
             await fetch(API_URL, {
@@ -205,16 +276,14 @@
             setTimeout(() => {
                 clickedBtn.classList.remove('syncing');
                 clickedBtn.classList.add('active');
-                document.getElementById('statusMsg').innerText = `✅ ${name} 已成功修改為【${newVal}】`;
+                document.getElementById('statusMsg').innerText = `✅ ${name} 已改為【${newVal}】`;
                 
-                // 同步更新記憶體中的資料
                 const headers = rawData[0];
                 const colIndex = headers.indexOf(eventName);
                 for(let i = 1; i < rawData.length; i++){
                     if(rawData[i][1] === name) { rawData[i][colIndex] = newVal; break; }
                 }
                 
-                // 重新計算數據面板（不重新建立網頁元件，只更新數字，避免干擾畫面）
                 recalculateStats(eventName);
             }, 300);
         } catch (e) {
@@ -223,7 +292,6 @@
         }
     }
 
-    // 專門用來即時重新計算數字的函式
     function recalculateStats(currentEvent) {
         const currentGroup = document.getElementById('groupSelect').value;
         const headers = rawData[0];
