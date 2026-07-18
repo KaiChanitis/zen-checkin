@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>禪修班雲端管理系統</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
-            /* 調整為沉穩優雅的禪風翡翠綠與大地色系 */
             --primary: #2d6a4f; 
             --primary-light: #d8f3dc;
             --bg: #f4f6f4;
@@ -32,12 +32,28 @@
         h2 { text-align: center; color: var(--primary); margin-top: 5px; margin-bottom: 5px; font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; }
         .status-bar { text-align: center; font-size: 12px; color: var(--text-light); margin-bottom: 20px; height: 18px; font-weight: 500; }
         
-        /* 優化：現代化幾何數據統計看板 */
+        .share-capture-area {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #f0f4f2;
+        }
+        .share-meta {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 6px;
+        }
+
         .stats-badge-group { 
             display: flex; 
             justify-content: space-between; 
             gap: 10px; 
-            margin-bottom: 20px; 
         }
         .stat-item { 
             flex: 1; 
@@ -70,11 +86,9 @@
             font-size: 15px; 
             outline: none; 
             color: var(--text);
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
         }
         select:last-child { margin-bottom: 0; }
         
-        /* 優化：名單條目與排版 */
         .member-item { 
             display: flex; 
             flex-direction: column; 
@@ -84,7 +98,6 @@
         .member-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .member-name { font-size: 17px; font-weight: 600; color: #222e35; letter-spacing: 0.5px; }
         
-        /* 優化：法名改為精緻的小標籤 */
         .member-dharma { 
             color: var(--primary); 
             font-size: 12px; 
@@ -96,7 +109,6 @@
         }
         .badge { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #f0f4f1; color: #52796f; font-size: 11px; font-weight: 500; border: 1px solid #e1e8e4; }
         
-        /* 優化：極具質感的點名按鈕群組 */
         .btn-group { display: flex; gap: 8px; width: 100%; }
         .status-btn { 
             flex: 1; 
@@ -114,7 +126,6 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* 亮起狀態：加入微內陰影與高質感色彩 */
         .status-btn.active[data-val="參加"] { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; font-weight: 600; box-shadow: inset 0 2px 4px rgba(46,125,50,0.1); }
         .status-btn.active[data-val="不參加"] { background: #ffebee; color: #c62828; border-color: #ef9a9a; font-weight: 600; box-shadow: inset 0 2px 4px rgba(198,40,40,0.1); }
         .status-btn.active[data-val="請假"] { background: #fff8e1; color: #ef6c00; border-color: #ffe082; font-weight: 600; box-shadow: inset 0 2px 4px rgba(239,108,0,0.1); }
@@ -122,11 +133,24 @@
         
         .status-btn.syncing { background: #fff8e1 !important; border-color: #ffe082 !important; color: #ef6c00 !important; animation: pulse 1s infinite alternate; }
         
-        @keyframes pulse {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; }
+        .export-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(45, 106, 79, 0.2);
+            transition: all 0.2s;
         }
+        .export-btn:active { transform: scale(0.98); opacity: 0.9; }
 
+        @keyframes pulse { 0% { opacity: 0.7; } 100% { opacity: 1; } }
         .loading-overlay { text-align: center; padding: 40px; color: var(--text-light); font-size: 14px; }
     </style>
 </head>
@@ -136,12 +160,17 @@
     <h2 id="activityTitle">活動點名載入中...</h2>
     <div id="statusMsg" class="status-bar">正在連線至雲端資料庫...</div>
 
-    <!-- 數據看板美化版 -->
-    <div class="stats-badge-group">
-        <div class="stat-item">總人數<strong id="statTotal">0</strong></div>
-        <div class="stat-item" style="border-top: 3px solid #2e7d32;">參加<strong id="statYes">0</strong></div>
-        <div class="stat-item" style="border-top: 3px solid #c62828;">不參加<strong id="statNo">0</strong></div>
-        <div class="stat-item" style="border-top: 3px solid #ef6c00;">請假/未點<strong id="statOther">0</strong></div>
+    <div id="captureArea" class="share-capture-area">
+        <div class="share-meta">
+            <span id="metaEvent">讀取中...</span>
+            <span id="metaGroup">全部顯示</span>
+        </div>
+        <div class="stats-badge-group">
+            <div class="stat-item">總人數<strong id="statTotal">0</strong></div>
+            <div class="stat-item" style="border-top: 3px solid #2e7d32;">參加<strong id="statYes">0</strong></div>
+            <div class="stat-item" style="border-top: 3px solid #c62828;">不參加<strong id="statNo">0</strong></div>
+            <div class="stat-item" style="border-top: 3px solid #ef6c00;">請假/未點<strong id="statOther">0</strong></div>
+        </div>
     </div>
 
     <div class="control-group">
@@ -166,6 +195,8 @@
 
     <div id="loading" class="loading-overlay">🍵 靜心讀取名單中，請稍候...</div>
     <div id="memberContainer" class="member-list"></div>
+
+    <button class="export-btn" onclick="exportToImage()">📷 匯出今日點名統計圖卡</button>
 </div>
 
 <script>
@@ -206,9 +237,13 @@
         const eventColIndex = headers.indexOf(currentEvent);
         
         document.getElementById('activityTitle').innerText = currentEvent;
+        document.getElementById('metaEvent').innerText = currentEvent;
+        document.getElementById('metaGroup').innerText = currentGroup;
+
         container.innerHTML = '';
 
-        let totalCount = 0, yesCount = 0, noCount = 0, otherCount = 0;
+        // 重新渲染時，嚴格呼叫重新計算，確保各活動數字乾淨獨立
+        recalculateStats(currentEvent);
 
         for(let i = 1; i < rawData.length; i++) {
             const row = rawData[i];
@@ -218,11 +253,6 @@
             const currentStatus = (row[eventColIndex] || '').trim();
 
             if (currentGroup === "全部" || group === currentGroup) {
-                totalCount++;
-                if (currentStatus === "參加") yesCount++;
-                else if (currentStatus === "不參加") noCount++;
-                else otherCount++;
-
                 const div = document.createElement('div');
                 div.className = 'member-item';
 
@@ -231,7 +261,6 @@
                     return `<button class="status-btn ${isActive}" data-val="${opt}" onclick="update('${name}', '${currentEvent}', '${opt}', this)">${opt}</button>`;
                 }).join('');
 
-                // 優化：法名包裝成小 tag 標籤
                 const dharmaHTML = dharmaName ? `<span class="member-dharma">${dharmaName}</span>` : '';
 
                 div.innerHTML = `
@@ -249,11 +278,6 @@
                 container.appendChild(div);
             }
         }
-
-        document.getElementById('statTotal').innerText = totalCount;
-        document.getElementById('statYes').innerText = yesCount;
-        document.getElementById('statNo').innerText = noCount;
-        document.getElementById('statOther').innerText = otherCount;
     }
 
     async function update(name, eventName, newVal, clickedBtn) {
@@ -292,6 +316,7 @@
         }
     }
 
+    // 優化後的活動專屬數據過濾核心
     function recalculateStats(currentEvent) {
         const currentGroup = document.getElementById('groupSelect').value;
         const headers = rawData[0];
@@ -299,22 +324,55 @@
         
         let totalCount = 0, yesCount = 0, noCount = 0, otherCount = 0;
 
-        for(let i = 1; i < rawData.length; i++) {
-            const row = rawData[i];
-            const group = row[0];
-            const currentStatus = (row[eventColIndex] || '').trim();
+        // 若 Sheets 中根本還沒有建立該活動的欄位（索引值為 -1），則直接將所有符合組別的人歸為未點
+        if (eventColIndex === -1) {
+            for(let i = 1; i < rawData.length; i++) {
+                if (currentGroup === "全部" || rawData[i][0] === currentGroup) {
+                    totalCount++;
+                    otherCount++;
+                }
+            }
+        } else {
+            for(let i = 1; i < rawData.length; i++) {
+                const row = rawData[i];
+                const group = row[0];
+                const currentStatus = (row[eventColIndex] || '').trim();
 
-            if (currentGroup === "全部" || group === currentGroup) {
-                totalCount++;
-                if (currentStatus === "參加") yesCount++;
-                else if (currentStatus === "不參加") noCount++;
-                else otherCount++;
+                if (currentGroup === "全部" || group === currentGroup) {
+                    totalCount++;
+                    if (currentStatus === "參加") {
+                        yesCount++;
+                    } else if (currentStatus === "不參加") {
+                        noCount++;
+                    } else {
+                        // 包含 請假、空白、或是填寫請選擇
+                        otherCount++;
+                    }
+                }
             }
         }
+        
         document.getElementById('statTotal').innerText = totalCount;
         document.getElementById('statYes').innerText = yesCount;
         document.getElementById('statNo').innerText = noCount;
         document.getElementById('statOther').innerText = otherCount;
+    }
+
+    function exportToImage() {
+        const element = document.getElementById('captureArea');
+        const eventName = document.getElementById('eventSelect').value;
+        const groupName = document.getElementById('groupSelect').value;
+        
+        html2canvas(element, {
+            backgroundColor: "#ffffff",
+            scale: 2 
+        }).then(canvas => {
+            const image = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.download = `${eventName}_${groupName}_點名統計.png`;
+            link.href = image;
+            link.click();
+        });
     }
 
     init();
