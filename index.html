@@ -31,7 +31,7 @@
         h2 { text-align: center; color: var(--primary); margin-top: 5px; margin-bottom: 5px; font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; }
         .status-bar { text-align: center; font-size: 12px; color: var(--text-light); margin-bottom: 15px; height: 18px; font-weight: 500; }
         
-        /* 現代化：頂端隨打即搜輸入框 */
+        /* 頂端隨打即搜輸入框 */
         .search-container {
             margin-bottom: 15px;
         }
@@ -51,7 +51,7 @@
             border-color: var(--primary);
         }
 
-        /* 現代化：底部固定單手操作面板 */
+        /* 底部固定單手操作面板 */
         .bottom-panel {
             position: fixed;
             bottom: 0;
@@ -116,6 +116,8 @@
         .badge { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #f0f4f1; color: #52796f; font-size: 11px; font-weight: 500; border: 1px solid #e1e8e4; }
         
         .btn-group { display: flex; gap: 8px; width: 100%; }
+        
+        /* 現代直覺型按鈕與基礎過渡效果 */
         .status-btn { 
             flex: 1; 
             padding: 12px 5px; 
@@ -126,22 +128,30 @@
             color: var(--text-light);
             border-radius: 10px; 
             cursor: pointer; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             -webkit-tap-highlight-color: transparent;
+            /* 讓縮放和背景顏色變化時有柔和的動態感 */
+            transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1), background-color 0.15s ease;
         }
         
-        /* 現代化觸控：點擊時的物理微縮反饋 */
+        /* 💥 觸控回饋：點擊按壓時明顯內縮縮放與加深底色 */
         .status-btn:active {
-            transform: scale(0.96);
+            transform: scale(0.91); /* 明顯縮放，產生 Q 彈感 */
+            background-color: #e2e8f0; /* 未選中按鈕按下去時變灰色 */
         }
         
+        /* 點名狀態亮起樣式 */
         .status-btn.active[data-val="參加"] { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; font-weight: 600; box-shadow: inset 0 2px 4px rgba(46,125,50,0.1); }
         .status-btn.active[data-val="不參加"] { background: #ffebee; color: #c62828; border-color: #ef9a9a; font-weight: 600; box-shadow: inset 0 2px 4px rgba(198,40,40,0.1); }
         .status-btn.active[data-val="請假"] { background: #fff8e1; color: #ef6c00; border-color: #ffe082; font-weight: 600; box-shadow: inset 0 2px 4px rgba(239,108,0,0.1); }
         .status-btn.active { background: #e8eaf6; color: #283593; border-color: #9fa8da; font-weight: 600; box-shadow: inset 0 2px 4px rgba(40,53,147,0.1); }
         
+        /* 💥 已選中的按鈕再次被點選按壓時，底色變更深的視覺反饋 */
+        .status-btn.active[data-val="參加"]:active { background: #c8e6c9 !important; }
+        .status-btn.active[data-val="不參加"]:active { background: #ffcdd2 !important; }
+        .status-btn.active[data-val="請假"]:active { background: #ffe082 !important; }
+
         .status-btn.syncing { background: #fff8e1 !important; border-color: #ffe082 !important; color: #ef6c00 !important; animation: pulse 1s infinite alternate; }
         
         @keyframes pulse { 0% { opacity: 0.7; } 100% { opacity: 1; } }
@@ -241,7 +251,7 @@
             // 1. 組別過濾
             const matchGroup = (currentGroup === "全部" || group === currentGroup);
             
-            // 2. 搜尋關鍵字過濾 (同時比對俗名與法名)
+            // 2. 搜尋關鍵字過濾 (俗名與法名同時比對)
             const matchKeyword = (!keyword || 
                                   name.toLowerCase().includes(keyword) || 
                                   dharmaName.toLowerCase().includes(keyword));
