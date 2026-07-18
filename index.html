@@ -154,17 +154,11 @@
         const config = eventConfigs.find(e => e.name === currentEvent);
         const headers = rawData[0];
         
-        // 🌟 容錯修正：去除前後空格後進行精準欄位匹配
-        const eventColIndex = headers.findIndex(h => h.toString().trim() === currentEvent.trim());
+        // 🌟 尋找活動欄位索引（移除空白後比對）
+        const eventColIndex = headers.findIndex(h => h && h.toString().trim() === currentEvent.trim());
         
         document.getElementById('activityTitle').innerText = currentEvent;
         container.innerHTML = '';
-
-        // 如果找不到該活動欄位，在狀態列提醒
-        if (eventColIndex === -1) {
-            document.getElementById('statusMsg').innerText = "⚠️ 找不到對應的雲端活動欄位";
-            return;
-        }
 
         for(let i = 1; i < rawData.length; i++) {
             const row = rawData[i];
@@ -172,8 +166,11 @@
             const name = row[1];
             const dharmaName = row[2] || '';
             
-            // 🌟 精準抓取對應欄位的狀態值
-            const currentStatus = (row[eventColIndex] !== undefined && row[eventColIndex] !== null) ? row[eventColIndex].toString().trim() : '';
+            // 🌟 讀取目前的點名狀態
+            let currentStatus = '';
+            if (eventColIndex !== -1 && row[eventColIndex] !== undefined && row[eventColIndex] !== null) {
+                currentStatus = row[eventColIndex].toString().trim();
+            }
 
             const matchGroup = (currentGroup === "全部" || group === currentGroup);
             const matchKeyword = (!keyword || 
@@ -215,30 +212,44 @@
         const btnGroup = clickedBtn.parentElement;
         const allBtns = btnGroup.querySelectorAll('.status-btn');
         
+        // 先讓畫面點擊的按鈕進入閃爍（同步中）狀態
         allBtns.forEach(btn => btn.classList.remove('active'));
         clickedBtn.classList.add('syncing');
         document.getElementById('statusMsg').innerText = `正在更新 ${name} 至【${newVal}】...`;
 
         try {
+            // 發送至 Google Apps Script 後台
             await fetch(API_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify({ name: name, event: eventName, status: newVal })
             });
             
+            // 🌟 【關鍵修正】強制即時同步到本地快取資料庫（rawData）中
+            const headers = rawData[0];
+            let eventColIndex = headers.findIndex(h => h && h.toString().trim() === eventName.trim());
+            
+            // 防呆：如果本地找不到標題欄位，就動態幫它加上，確保狀態一定存得進去
+            if (eventColIndex === -1) {
+                headers.push(eventName);
+                eventColIndex = headers.length - 1;
+            }
+
+            // 更新快取數值
+            for(let i = 1; i < rawData.length; i++){
+                if(rawData[i][1] === name) { 
+                    rawData[i][eventColIndex] = newVal; 
+                    break; 
+                }
+            }
+
+            // 動態效果延時結束後，切換為「恆亮」active 狀態
             setTimeout(() => {
                 clickedBtn.classList.remove('syncing');
                 clickedBtn.classList.add('active');
                 document.getElementById('statusMsg').innerText = `✅ ${name} 已改為【${newVal}】`;
-                
-                const headers = rawData[0];
-                const colIndex = headers.findIndex(h => h.toString().trim() === eventName.trim());
-                if (colIndex !== -1) {
-                    for(let i = 1; i < rawData.length; i++){
-                        if(rawData[i][1] === name) { rawData[i][colIndex] = newVal; break; }
-                    }
-                }
             }, 300);
+
         } catch (e) {
             alert('更新失敗，請檢查網路');
             render();
