@@ -45,32 +45,60 @@
         .panel-field label { display: block; font-size: 11px; font-weight: 600; color: #52796f; margin-bottom: 4px; text-transform: uppercase; }
         .bottom-panel select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; font-size: 14px; outline: none; color: var(--text); }
         
-        .member-item { display: flex; flex-direction: column; padding: 16px 8px; border-bottom: 1px solid #edf2f0; }
+        .member-item { display: flex; flex-direction: column; padding: 22px 8px 14px 8px; border-bottom: 1px solid #edf2f0; }
         .member-item:last-child { border-bottom: none; }
-        .member-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .member-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .member-name { font-size: 17px; font-weight: 600; color: #222e35; letter-spacing: 0.5px; }
         
         .member-dharma { color: var(--primary); font-size: 12px; margin-left: 6px; background: var(--primary-light); padding: 2px 6px; border-radius: 6px; font-weight: 500; }
         .badge { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #f0f4f1; color: #52796f; font-size: 11px; font-weight: 500; border: 1px solid #e1e8e4; }
         
-        .btn-group { display: flex; gap: 8px; width: 100%; flex-wrap: wrap; }
+        /* 按鈕容器：允許長選項自動換行，增加上下間距讓立體陰影不重疊 */
+        .btn-group { display: flex; gap: 10px; width: 100%; flex-wrap: wrap; padding: 4px 0; }
         
+        /* 🌟 平常沒點選：呈現微凸起的實體按鍵感 */
         .status-btn { 
-            flex: 1; min-width: 70px; padding: 12px 5px; font-size: 14px; font-weight: 500; border: 1px solid #d8e2dc; background: #ffffff; color: var(--text-light); border-radius: 10px; cursor: pointer; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); -webkit-tap-highlight-color: transparent; transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1), background-color 0.15s ease;
+            flex: 1; 
+            min-width: 75px; 
+            padding: 12px 5px; 
+            font-size: 14px; 
+            font-weight: 500; 
+            border: 1px solid #cbd5e1; 
+            background: #ffffff; 
+            color: var(--text-light); 
+            border-radius: 12px; 
+            cursor: pointer; 
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+            
+            /* 利用下沉陰影與向上位移創造凸起高度 */
+            box-shadow: 0 4px 0px #cbd5e1, 0 4px 10px rgba(0, 0, 0, 0.05);
+            transform: translateY(-4px);
+            transition: all 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         
-        .status-btn:active { transform: scale(0.95); background-color: #e2e8f0; }
+        /* 手指剛按下去的未選取按鈕（短暫下沉彈性） */
+        .status-btn:active { 
+            transform: translateY(-1px);
+            box-shadow: 0 1px 0px #cbd5e1, 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
         
-        /* 🌟 核心修正：不綁定特定文字，只要是被選中的按鈕，一律套用高質感的禪風深綠色恆亮 */
+        /* 🌟 點選後：呈現高質感深綠色、且完全下壓嵌入的狀態 */
         .status-btn.active { 
             background: var(--primary) !important; 
             color: #ffffff !important; 
             border-color: var(--primary) !important; 
             font-weight: 600; 
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.15); 
+            
+            /* 消除下方凸出陰影，改用內陰影，並向下壓回平面(0px) */
+            transform: translateY(0px) !important; 
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.3) !important; 
         }
         
-        .status-btn.active:active { background: #1b4332 !important; }
+        /* 已點選的按鈕若再被按，維持壓著的狀態，不產生無謂的彈跳位移 */
+        .status-btn.active:active { 
+            transform: translateY(0px) !important; 
+        }
 
         .loading-overlay { text-align: center; padding: 40px; color: var(--text-light); font-size: 14px; }
     </style>
@@ -179,7 +207,7 @@
                 const div = document.createElement('div');
                 div.className = 'member-item';
 
-                // 這裡會自動從您的試算表設定檔中抓取所有自訂選項（大椰墊、靠背椅等）
+                // 自動渲染該活動在試算表設定的所有自訂選項（大椰墊、靠背椅、參加等）
                 let buttonsHTML = config.options.map(opt => {
                     const isMatch = (currentStatus === opt.trim());
                     const isActive = isMatch ? 'active' : '';
@@ -211,11 +239,12 @@
         const btnGroup = clickedBtn.parentElement;
         const allBtns = btnGroup.querySelectorAll('.status-btn');
         
-        // 🌟 樂觀更新：一碰按鈕，不限字面文字，立馬讓該按鈕套用「深綠色恆亮」，同組其他按鈕熄滅
+        // 1. 樂觀更新：手指碰到的瞬間，無論字面內容是什麼，立馬壓下並轉為深綠色恆亮
         allBtns.forEach(btn => btn.classList.remove('active'));
         clickedBtn.classList.add('active');
         document.getElementById('statusMsg').innerText = `已變更 ${name} 至【${newVal}】，正在同步雲端...`;
 
+        // 2. 將新資料即時同步至前端網頁的內存快取中（確保搜尋、篩選切換時狀態不會消失）
         const headers = rawData[0];
         let eventColIndex = headers.findIndex(h => h && h.toString().trim() === eventName.trim());
         if (eventColIndex === -1) {
@@ -229,6 +258,7 @@
             }
         }
 
+        // 3. 在背景安靜發送至 Google 試算表後台
         try {
             fetch(API_URL, {
                 method: 'POST',
