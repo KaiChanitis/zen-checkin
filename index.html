@@ -21,7 +21,7 @@
         .member-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid #f1f5f9; }
         .member-info { flex: 1; }
         .member-name { font-size: 17px; font-weight: 600; color: #334155; }
-        .member-dharma { color: var(--primary); font-size: 15px; margin-left: 4px; }
+        .member-dharma { color: var(--primary) !important; font-size: 15px; margin-left: 4px; }
         .member-group { font-size: 12px; color: #94a3b8; margin-top: 2px; }
         .item-select { width: auto; min-width: 120px; padding: 6px; font-size: 14px; margin-bottom: 0; }
         .loading-overlay { text-align: center; padding: 40px; color: #64748b; }
@@ -59,7 +59,7 @@
 </div>
 
 <script>
-    // --- ⚠️ 重要：請在此處填入您的 Google Apps Script 網址 ---
+    // --- 已為您保留目前的 Google Apps Script 網址 ---
     const API_URL = "https://script.google.com/macros/s/AKfycbxrrCkL3c7SnVn7LDqmN9yUH4SvjWcdbPW-rkjbem_gRfYRiSIMunP8uwudm_fkAnN5/exec";
     // -------------------------------------------------------
 
@@ -122,7 +122,7 @@
                             <span class="member-dharma">(${dharmaName || '無法名'})</span>
                         </div>
                     </div>
-                    <select class="item-select" onchange="update('${name}', '${currentEvent}', this.value, this, '${currentStatus}')">
+                    <select class="item-select" onchange="update('${name}', '${currentEvent}', this.value, this)">
                         ${optionsHTML}
                     </select>
                 `;
@@ -131,14 +131,8 @@
         }
     }
 
-    async function update(name, eventName, newVal, element, oldVal) {
-        // --- 防呆機制：彈出確認視窗 ---
-        const proceed = confirm(`確認要將「${name}」更改為：${newVal} 嗎？`);
-        if (!proceed) {
-            render(); // 取消則重新繪製頁面恢復原樣
-            return;
-        }
-
+    async function update(name, eventName, newVal, element) {
+        // 已移除彈出確認視窗，改為選取後直接執行以下同步流程
         element.style.borderColor = "#fbbf24";
         document.getElementById('statusMsg').innerText = `正在同步 ${name}...`;
 
@@ -152,10 +146,11 @@
             setTimeout(() => {
                 element.style.borderColor = "#10b981";
                 document.getElementById('statusMsg').innerText = `✅ ${name} 更新成功`;
-                // 更新記憶體中的資料，避免切換組別後變回舊的
+                
+                // 同步更新記憶體中的資料
                 const headers = rawData[0];
                 const colIndex = headers.indexOf(eventName);
-                for(let i=1; i<rawData.length; i++){
+                for(let i = 1; i < rawData.length; i++){
                     if(rawData[i][1] === name) { rawData[i][colIndex] = newVal; break; }
                 }
             }, 600);
