@@ -18,14 +18,40 @@
         .control-group { background: #f1f5f9; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
         label { display: block; font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 5px; }
         select { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; font-size: 16px; outline: none; }
-        .member-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid #f1f5f9; }
-        .member-info { flex: 1; }
+        
+        /* 點名條目直式彈性排版，適合放按鈕 */
+        .member-item { display: flex; flex-direction: column; padding: 15px 10px; border-bottom: 1px solid #f1f5f9; }
+        .member-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .member-name { font-size: 17px; font-weight: 600; color: #334155; }
         .member-dharma { color: var(--primary) !important; font-size: 15px; margin-left: 4px; }
-        .member-group { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-        .item-select { width: auto; min-width: 120px; padding: 6px; font-size: 14px; margin-bottom: 0; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; background: #e0e7ff; color: #4338ca; font-size: 11px; }
+        
+        /* 直覺式按鈕群組樣式 */
+        .btn-group { display: flex; gap: 8px; width: 100%; }
+        .status-btn { 
+            flex: 1; 
+            padding: 10px 5px; 
+            font-size: 14px; 
+            font-weight: 500; 
+            border: 1px solid #cbd5e1; 
+            background: white; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* 根據不同狀態亮起不同的顏色（可依您的習慣修改關鍵字） */
+        .status-btn.active[data-val="參加"] { background: #dcfce7; color: #15803d; border-color: #86efac; font-weight: 600; }
+        .status-btn.active[data-val="不參加"] { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; font-weight: 600; }
+        .status-btn.active[data-val="請假"] { background: #fef3c7; color: #b45309; border-color: #fde68a; font-weight: 600; }
+        /* 通用選中樣式（如果沒對中上面的關鍵字，預設亮藍色） */
+        .status-btn.active { background: #e0e7ff; color: #4338ca; border-color: #a5b4fc; font-weight: 600; }
+        
+        /* 點擊同步中的動態特效 */
+        .status-btn.syncing { background: #fef3c7 !important; border-color: #fbbf24 !important; color: #d97706 !important; }
+
         .loading-overlay { text-align: center; padding: 40px; color: #64748b; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; background: #e0e7ff; color: #4338ca; font-size: 11px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -105,36 +131,46 @@
             const group = row[0];
             const name = row[1];
             const dharmaName = row[2];
-            const currentStatus = row[eventColIndex];
+            const currentStatus = row[eventColIndex] || '';
 
             if (currentGroup === "全部" || group === currentGroup) {
                 const div = document.createElement('div');
                 div.className = 'member-item';
-                let optionsHTML = config.options.map(opt => 
-                    `<option value="${opt}" ${currentStatus === opt ? 'selected' : ''}>${opt}</option>`
-                ).join('');
+
+                // 生成並排按鈕
+                let buttonsHTML = config.options.map(opt => {
+                    const isActive = (currentStatus.trim() === opt.trim()) ? 'active' : '';
+                    return `<button class="status-btn ${isActive}" data-val="${opt}" onclick="update('${name}', '${currentEvent}', '${opt}', this)">${opt}</button>`;
+                }).join('');
 
                 div.innerHTML = `
-                    <div class="member-info">
-                        <div class="badge">${group}</div>
+                    <div class="member-header">
                         <div>
                             <span class="member-name">${name}</span>
                             <span class="member-dharma">(${dharmaName || '無法名'})</span>
                         </div>
+                        <div class="badge">${group}</div>
                     </div>
-                    <select class="item-select" onchange="update('${name}', '${currentEvent}', this.value, this)">
-                        ${optionsHTML}
-                    </select>
+                    <div class="btn-group">
+                        ${buttonsHTML}
+                    </div>
                 `;
                 container.appendChild(div);
             }
         }
     }
 
-    async function update(name, eventName, newVal, element) {
-        // 已移除彈出確認視窗，改為選取後直接執行以下同步流程
-        element.style.borderColor = "#fbbf24";
-        document.getElementById('statusMsg').innerText = `正在同步 ${name}...`;
+    async function update(name, eventName, newVal, clickedBtn) {
+        // 如果點擊的是已經選中的狀態，就不重複送出資料
+        if (clickedBtn.classList.contains('active')) return;
+
+        // 找到同一個按鈕群組，先移除其他按鈕的選取狀態，並讓當前按鈕呈現同步中
+        const btnGroup = clickedBtn.parentElement;
+        const allBtns = btnGroup.querySelectorAll('.status-btn');
+        allBtns.forEach(btn => btn.classList.remove('active'));
+        
+        clickedBtn.classList.add('syncing');
+        document.getElementById('statusMsg').innerText = `正在同步 ${name} 👉 ${newVal}...`;
 
         try {
             await fetch(API_URL, {
@@ -144,8 +180,9 @@
             });
             
             setTimeout(() => {
-                element.style.borderColor = "#10b981";
-                document.getElementById('statusMsg').innerText = `✅ ${name} 更新成功`;
+                clickedBtn.classList.remove('syncing');
+                clickedBtn.classList.add('active');
+                document.getElementById('statusMsg').innerText = `✅ ${name} 已改為【${newVal}】`;
                 
                 // 同步更新記憶體中的資料
                 const headers = rawData[0];
@@ -153,7 +190,7 @@
                 for(let i = 1; i < rawData.length; i++){
                     if(rawData[i][1] === name) { rawData[i][colIndex] = newVal; break; }
                 }
-            }, 600);
+            }, 300); // 按鈕反應加快到 300 毫秒
         } catch (e) {
             alert('更新失敗，請檢查網路');
             render();
