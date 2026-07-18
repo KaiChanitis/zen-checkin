@@ -15,6 +15,12 @@
         .card { background: var(--card); max-width: 500px; margin: 10px auto; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         h2 { text-align: center; color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; }
         .status-bar { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 15px; height: 18px; }
+        
+        /* 新增：統計看板樣式 */
+        .stats-badge-group { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 15px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1; }
+        .stat-item { flex: 1; text-align: center; font-size: 13px; color: #475569; }
+        .stat-item strong { display: block; font-size: 18px; color: #1e293b; margin-top: 2px; }
+
         .control-group { background: #f1f5f9; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
         label { display: block; font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 5px; }
         select { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; font-size: 16px; outline: none; }
@@ -54,6 +60,14 @@
 <div class="card">
     <h2 id="activityTitle">活動點名載入中...</h2>
     <div id="statusMsg" class="status-bar">正在連線至雲端資料庫...</div>
+
+    <!-- 新增：頂端即時數據看板 -->
+    <div class="stats-badge-group">
+        <div class="stat-item">總人數<strong id="statTotal">0</strong></div>
+        <div class="stat-item" style="color: #16a34a;">參加<strong id="statYes">0</strong></div>
+        <div class="stat-item" style="color: #dc2626;">不參加<strong id="statNo">0</strong></div>
+        <div class="stat-item" style="color: #d97706;">請假/未點<strong id="statOther">0</strong></div>
+    </div>
 
     <div class="control-group">
         <label>選擇目前活動：</label>
@@ -119,19 +133,32 @@
         document.getElementById('activityTitle').innerText = currentEvent;
         container.innerHTML = '';
 
+        // 統計計數器
+        let totalCount = 0;
+        let yesCount = 0;
+        let noCount = 0;
+        let otherCount = 0;
+
         for(let i = 1; i < rawData.length; i++) {
             const row = rawData[i];
             const group = row[0];
             const name = row[1];
             const dharmaName = row[2];
-            const currentStatus = row[eventColIndex] || '';
+            const currentStatus = (row[eventColIndex] || '').trim();
 
+            // 如果符合篩選條件，納入計算與渲染
             if (currentGroup === "全部" || group === currentGroup) {
+                totalCount++;
+                if (currentStatus === "參加") yesCount++;
+                else if (currentStatus === "不參加") noCount++;
+                else if (currentStatus === "請假" || currentStatus === "" || currentStatus === "請選擇") otherCount++;
+                else otherCount++; // 其他自訂狀態
+
                 const div = document.createElement('div');
                 div.className = 'member-item';
 
                 let buttonsHTML = config.options.map(opt => {
-                    const isActive = (currentStatus.trim() === opt.trim()) ? 'active' : '';
+                    const isActive = (currentStatus === opt.trim()) ? 'active' : '';
                     return `<button class="status-btn ${isActive}" data-val="${opt}" onclick="update('${name}', '${currentEvent}', '${opt}', this)">${opt}</button>`;
                 }).join('');
 
@@ -150,16 +177,20 @@
                 container.appendChild(div);
             }
         }
+
+        // 更新頂端看板數字
+        document.getElementById('statTotal').innerText = totalCount;
+        document.getElementById('statYes').innerText = yesCount;
+        document.getElementById('statNo').innerText = noCount;
+        document.getElementById('statOther').innerText = otherCount;
     }
 
     async function update(name, eventName, newVal, clickedBtn) {
-        // 修正：只有當點擊「已經是綠色/選中」的按鈕時才不反應。如果是選隔壁不同的按鈕，就可以按。
         if (clickedBtn.classList.contains('active')) return;
 
         const btnGroup = clickedBtn.parentElement;
         const allBtns = btnGroup.querySelectorAll('.status-btn');
         
-        // 先把該人員的所有按鈕取消選取，並讓當前點擊的按鈕進入同步狀態
         allBtns.forEach(btn => btn.classList.remove('active'));
         clickedBtn.classList.add('syncing');
         document.getElementById('statusMsg').innerText = `正在更新 ${name} 👉 ${newVal}...`;
@@ -182,11 +213,40 @@
                 for(let i = 1; i < rawData.length; i++){
                     if(rawData[i][1] === name) { rawData[i][colIndex] = newVal; break; }
                 }
+                
+                // 重新計算數據面板（不重新建立網頁元件，只更新數字，避免干擾畫面）
+                recalculateStats(eventName);
             }, 300);
         } catch (e) {
             alert('更新失敗，請檢查網路');
             render();
         }
+    }
+
+    // 專門用來即時重新計算數字的函式
+    function recalculateStats(currentEvent) {
+        const currentGroup = document.getElementById('groupSelect').value;
+        const headers = rawData[0];
+        const eventColIndex = headers.indexOf(currentEvent);
+        
+        let totalCount = 0, yesCount = 0, noCount = 0, otherCount = 0;
+
+        for(let i = 1; i < rawData.length; i++) {
+            const row = rawData[i];
+            const group = row[0];
+            const currentStatus = (row[eventColIndex] || '').trim();
+
+            if (currentGroup === "全部" || group === currentGroup) {
+                totalCount++;
+                if (currentStatus === "參加") yesCount++;
+                else if (currentStatus === "不參加") noCount++;
+                else otherCount++;
+            }
+        }
+        document.getElementById('statTotal').innerText = totalCount;
+        document.getElementById('statYes').innerText = yesCount;
+        document.getElementById('statNo').innerText = noCount;
+        document.getElementById('statOther').innerText = otherCount;
     }
 
     init();
