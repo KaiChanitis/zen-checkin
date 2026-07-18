@@ -17,7 +17,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
             background: var(--bg); 
             color: var(--text); 
-            padding: 15px 15px 120px 15px; /* 底部預留空間給固定面板 */
+            padding: 15px 15px 120px 15px; 
             margin: 0; 
         }
         .card { 
@@ -31,123 +31,40 @@
         h2 { text-align: center; color: var(--primary); margin-top: 5px; margin-bottom: 5px; font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; }
         .status-bar { text-align: center; font-size: 12px; color: var(--text-light); margin-bottom: 15px; height: 18px; font-weight: 500; }
         
-        /* 頂端隨打即搜輸入框 */
-        .search-container {
-            margin-bottom: 15px;
-        }
+        .search-container { margin-bottom: 15px; }
         .search-input {
-            width: 100%;
-            padding: 12px 16px;
-            box-sizing: border-box;
-            border-radius: 12px;
-            border: 1px solid #cbd5e1;
-            font-size: 15px;
-            outline: none;
-            color: var(--text);
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
-            transition: border-color 0.2s;
+            width: 100%; padding: 12px 16px; box-sizing: border-box; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 15px; outline: none; color: var(--text); box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); transition: border-color 0.2s;
         }
-        .search-input:focus {
-            border-color: var(--primary);
-        }
+        .search-input:focus { border-color: var(--primary); }
 
-        /* 底部固定單手操作面板 */
         .bottom-panel {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(234, 239, 236, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 12px 20px env(safe-area-inset-bottom, 12px) 20px;
-            border-top: 1px solid #dee5e2;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-            z-index: 1000;
+            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(234, 239, 236, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 12px 20px env(safe-area-inset-bottom, 12px) 20px; border-top: 1px solid #dee5e2; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 1000;
         }
-        .panel-grid {
-            max-width: 500px;
-            margin: 0 auto;
-            display: flex;
-            gap: 10px;
-        }
-        .panel-field {
-            flex: 1;
-        }
-        .panel-field label {
-            display: block;
-            font-size: 11px;
-            font-weight: 600;
-            color: #52796f;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
-        .bottom-panel select { 
-            width: 100%; 
-            padding: 10px; 
-            border-radius: 8px; 
-            border: 1px solid #cbd5e1; 
-            background: white; 
-            font-size: 14px; 
-            outline: none; 
-            color: var(--text);
-        }
+        .panel-grid { max-width: 500px; margin: 0 auto; display: flex; gap: 10px; }
+        .panel-field { flex: 1; }
+        .panel-field label { display: block; font-size: 11px; font-weight: 600; color: #52796f; margin-bottom: 4px; text-transform: uppercase; }
+        .bottom-panel select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; font-size: 14px; outline: none; color: var(--text); }
         
-        /* 名單條目排版 */
-        .member-item { 
-            display: flex; 
-            flex-direction: column; 
-            padding: 16px 8px; 
-            border-bottom: 1px solid #edf2f0; 
-        }
+        .member-item { display: flex; flex-direction: column; padding: 16px 8px; border-bottom: 1px solid #edf2f0; }
         .member-item:last-child { border-bottom: none; }
         .member-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .member-name { font-size: 17px; font-weight: 600; color: #222e35; letter-spacing: 0.5px; }
         
-        .member-dharma { 
-            color: var(--primary); 
-            font-size: 12px; 
-            margin-left: 6px; 
-            background: var(--primary-light);
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-weight: 500;
-        }
+        .member-dharma { color: var(--primary); font-size: 12px; margin-left: 6px; background: var(--primary-light); padding: 2px 6px; border-radius: 6px; font-weight: 500; }
         .badge { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #f0f4f1; color: #52796f; font-size: 11px; font-weight: 500; border: 1px solid #e1e8e4; }
         
         .btn-group { display: flex; gap: 8px; width: 100%; }
         
-        /* 現代直覺型按鈕與基礎過渡效果 */
         .status-btn { 
-            flex: 1; 
-            padding: 12px 5px; 
-            font-size: 14px; 
-            font-weight: 500; 
-            border: 1px solid #d8e2dc; 
-            background: #ffffff; 
-            color: var(--text-light);
-            border-radius: 10px; 
-            cursor: pointer; 
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            -webkit-tap-highlight-color: transparent;
-            /* 讓縮放和背景顏色變化時有柔和的動態感 */
-            transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1), background-color 0.15s ease;
+            flex: 1; padding: 12px 5px; font-size: 14px; font-weight: 500; border: 1px solid #d8e2dc; background: #ffffff; color: var(--text-light); border-radius: 10px; cursor: pointer; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); -webkit-tap-highlight-color: transparent; transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1), background-color 0.15s ease;
         }
         
-        /* 💥 觸控回饋：點擊按壓時明顯內縮縮放與加深底色 */
-        .status-btn:active {
-            transform: scale(0.91); /* 明顯縮放，產生 Q 彈感 */
-            background-color: #e2e8f0; /* 未選中按鈕按下去時變灰色 */
-        }
+        .status-btn:active { transform: scale(0.91); background-color: #e2e8f0; }
         
-        /* 點名狀態亮起樣式 */
         .status-btn.active[data-val="參加"] { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; font-weight: 600; box-shadow: inset 0 2px 4px rgba(46,125,50,0.1); }
         .status-btn.active[data-val="不參加"] { background: #ffebee; color: #c62828; border-color: #ef9a9a; font-weight: 600; box-shadow: inset 0 2px 4px rgba(198,40,40,0.1); }
         .status-btn.active[data-val="請假"] { background: #fff8e1; color: #ef6c00; border-color: #ffe082; font-weight: 600; box-shadow: inset 0 2px 4px rgba(239,108,0,0.1); }
-        .status-btn.active { background: #e8eaf6; color: #283593; border-color: #9fa8da; font-weight: 600; box-shadow: inset 0 2px 4px rgba(40,53,147,0.1); }
         
-        /* 💥 已選中的按鈕再次被點選按壓時，底色變更深的視覺反饋 */
         .status-btn.active[data-val="參加"]:active { background: #c8e6c9 !important; }
         .status-btn.active[data-val="不參加"]:active { background: #ffcdd2 !important; }
         .status-btn.active[data-val="請假"]:active { background: #ffe082 !important; }
@@ -164,7 +81,6 @@
     <h2 id="activityTitle">活動點名載入中...</h2>
     <div id="statusMsg" class="status-bar">正在連線至雲端資料庫...</div>
 
-    <!-- 頂端隨打即搜區 -->
     <div class="search-container">
         <input type="text" id="searchInput" class="search-input" placeholder="🔍 輸入姓名或法名快速搜尋..." oninput="render()">
     </div>
@@ -173,7 +89,6 @@
     <div id="memberContainer" class="member-list"></div>
 </div>
 
-<!-- 底部固定單手操作面板 -->
 <div class="bottom-panel">
     <div class="panel-grid">
         <div class="panel-field">
@@ -234,24 +149,33 @@
         const currentGroup = document.getElementById('groupSelect').value;
         const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
         
+        if (!currentEvent || rawData.length === 0) return;
+
         const config = eventConfigs.find(e => e.name === currentEvent);
         const headers = rawData[0];
-        const eventColIndex = headers.indexOf(currentEvent);
+        
+        // 🌟 容錯修正：去除前後空格後進行精準欄位匹配
+        const eventColIndex = headers.findIndex(h => h.toString().trim() === currentEvent.trim());
         
         document.getElementById('activityTitle').innerText = currentEvent;
         container.innerHTML = '';
+
+        // 如果找不到該活動欄位，在狀態列提醒
+        if (eventColIndex === -1) {
+            document.getElementById('statusMsg').innerText = "⚠️ 找不到對應的雲端活動欄位";
+            return;
+        }
 
         for(let i = 1; i < rawData.length; i++) {
             const row = rawData[i];
             const group = row[0];
             const name = row[1];
             const dharmaName = row[2] || '';
-            const currentStatus = (row[eventColIndex] || '').trim();
-
-            // 1. 組別過濾
-            const matchGroup = (currentGroup === "全部" || group === currentGroup);
             
-            // 2. 搜尋關鍵字過濾 (俗名與法名同時比對)
+            // 🌟 精準抓取對應欄位的狀態值
+            const currentStatus = (row[eventColIndex] !== undefined && row[eventColIndex] !== null) ? row[eventColIndex].toString().trim() : '';
+
+            const matchGroup = (currentGroup === "全部" || group === currentGroup);
             const matchKeyword = (!keyword || 
                                   name.toLowerCase().includes(keyword) || 
                                   dharmaName.toLowerCase().includes(keyword));
@@ -261,7 +185,8 @@
                 div.className = 'member-item';
 
                 let buttonsHTML = config.options.map(opt => {
-                    const isActive = (currentStatus === opt.trim()) ? 'active' : '';
+                    const isMatch = (currentStatus === opt.trim());
+                    const isActive = isMatch ? 'active' : '';
                     return `<button class="status-btn ${isActive}" data-val="${opt}" onclick="update('${name}', '${currentEvent}', '${opt}', this)">${opt}</button>`;
                 }).join('');
 
@@ -307,9 +232,11 @@
                 document.getElementById('statusMsg').innerText = `✅ ${name} 已改為【${newVal}】`;
                 
                 const headers = rawData[0];
-                const colIndex = headers.indexOf(eventName);
-                for(let i = 1; i < rawData.length; i++){
-                    if(rawData[i][1] === name) { rawData[i][colIndex] = newVal; break; }
+                const colIndex = headers.findIndex(h => h.toString().trim() === eventName.trim());
+                if (colIndex !== -1) {
+                    for(let i = 1; i < rawData.length; i++){
+                        if(rawData[i][1] === name) { rawData[i][colIndex] = newVal; break; }
+                    }
                 }
             }, 300);
         } catch (e) {
