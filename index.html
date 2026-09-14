@@ -33,7 +33,7 @@
         h2 { text-align: center; color: var(--primary); margin-top: 5px; margin-bottom: 5px; font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; }
         .status-bar { text-align: center; font-size: 12px; color: var(--text-light); margin-bottom: 15px; height: 18px; font-weight: 500; }
         
-        /* 🌟 頂部頁籤切換 (Tabs) */
+        /* 頂部頁籤切換 (Tabs) */
         .tab-nav {
             display: flex;
             background: #e2eef0;
@@ -66,7 +66,7 @@
         }
         .search-input:focus { border-color: var(--primary); }
 
-        /* 🌟 頁面二：彙整系統樣式 */
+        /* 頁面二：彙整系統樣式 */
         .group-summary-card {
             background: #fafcfb;
             border: 1px solid #e2eef0;
@@ -140,13 +140,13 @@
     <h2 id="activityTitle">活動點名載入中...</h2>
     <div id="statusMsg" class="status-bar">正在連線至雲端資料庫...</div>
 
-    <!-- 🌟 切換頁籤 -->
+    <!-- 切換頁籤 -->
     <div class="tab-nav">
         <button id="tab1Btn" class="tab-btn active" onclick="switchTab(1)">📝 點名登錄</button>
         <button id="tab2Btn" class="tab-btn" onclick="switchTab(2)">📊 出席彙整與預警</button>
     </div>
 
-    <!-- 🌟 頁面一：點名登錄系統 -->
+    <!-- 頁面一：點名登錄系統 -->
     <div id="page1">
         <div class="search-container">
             <input type="text" id="searchInput" class="search-input" placeholder="🔍 輸入姓名或法名快速搜尋..." oninput="renderPage1()">
@@ -155,7 +155,7 @@
         <div id="memberContainer" class="member-list"></div>
     </div>
 
-    <!-- 🌟 頁面二：彙整系統（即時點名狀況 + 連續3次請假預警） -->
+    <!-- 頁面二：彙整系統（即時點名狀況 + 連續3次「上課」請假預警） -->
     <div id="page2" style="display: none;">
         <div id="summaryContainer"></div>
     </div>
@@ -239,26 +239,32 @@
         }
     }
 
-    // 判斷某學員是否「連續3次請假」
+    // 🌟 白名單判定：僅欄位名稱包含「上課」二字，才納入高風險請假統計
     function checkHighRisk(memberRow) {
         const headers = rawData[0];
-        // 抓出所有活動列的索引 (從第 3 欄之後開始)
         let leaveCount = 0;
         
         for (let c = headers.length - 1; c >= 3; c--) {
+            const eventName = (headers[c] || "").toString().trim();
             const val = (memberRow[c] || "").toString().trim();
+            
+            // 跳過非「上課」欄位（如：半日禪、活動、出遊等）
+            if (!eventName.includes("上課")) {
+                continue; 
+            }
+
             if (val === "請假" || val === "不參加") {
                 leaveCount++;
                 if (leaveCount >= 3) return true;
             } else if (val !== "") {
-                // 只要中間有一次出席或非請假狀態，連續就中斷
-                break;
+                // 正式上課有出席，即中斷連續請假累計
+                break; 
             }
         }
         return false;
     }
 
-    // 🌟 渲染頁面一：點名登錄
+    // 渲染頁面一：點名登錄
     function renderPage1() {
         const container = document.getElementById('memberContainer');
         const currentEvent = document.getElementById('eventSelect').value;
@@ -316,7 +322,7 @@
         }
     }
 
-    // 🌟 渲染頁面二：出席彙整系統
+    // 🌟 渲染頁面二：出席彙整系統（含中文組別自訂排序）
     function renderPage2() {
         const container = document.getElementById('summaryContainer');
         const currentEvent = document.getElementById('eventSelect').value;
@@ -327,7 +333,6 @@
         const headers = rawData[0];
         const eventColIndex = headers.findIndex(h => h && h.toString().trim() === currentEvent.trim());
 
-        // 分組統計資料結構
         const groups = {};
 
         for (let i = 1; i < rawData.length; i++) {
@@ -354,7 +359,19 @@
 
         container.innerHTML = '';
 
-        Object.keys(groups).sort().forEach(gName => {
+        // 中文組別順序表
+        const groupOrder = [
+            "第一組", "第二組", "第三組", "第四組", "第五組",
+            "第六組", "第七組", "第八組", "第九組", "第十組"
+        ];
+
+        Object.keys(groups).sort((a, b) => {
+            let indexA = groupOrder.indexOf(a);
+            let indexB = groupOrder.indexOf(b);
+            if (indexA === -1) indexA = 99;
+            if (indexB === -1) indexB = 99;
+            return indexA - indexB;
+        }).forEach(gName => {
             const members = groups[gName];
             const card = document.createElement('div');
             card.className = 'group-summary-card';
@@ -363,7 +380,6 @@
                 const riskBadge = m.isRisk ? `<span class="risk-tag">高風險</span>` : '';
                 const dharmaHTML = m.dharmaName ? `(${m.dharmaName})` : '';
                 
-                // 狀態樣式調整
                 let statusColor = '#2f3e46';
                 if (m.status === '請假' || m.status === '不參加') statusColor = '#d90429';
                 else if (m.status === '未點名') statusColor = '#94a3b8';
