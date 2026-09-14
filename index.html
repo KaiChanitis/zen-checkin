@@ -13,7 +13,7 @@
             --text: #2f3e46;
             --text-light: #6c757d;
             --danger: #d90429;
-            --danger-bg: #ffedd5;
+            --danger-bg: #ffe3e3;
         }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
@@ -66,6 +66,21 @@
         }
         .search-input:focus { border-color: var(--primary); }
 
+        /* 🌟 高風險說明提示框 */
+        .risk-notice-box {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         /* 頁面二：彙整系統樣式 */
         .group-summary-card {
             background: #fafcfb;
@@ -97,10 +112,25 @@
             color: var(--danger);
             font-weight: 700;
             font-size: 12px;
-            background: #ffe3e3;
+            background: var(--danger-bg);
             padding: 2px 6px;
             border-radius: 6px;
             margin-left: 6px;
+        }
+
+        /* 🌟 各組底部出席率統計列 */
+        .group-summary-footer {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        .group-summary-footer strong {
+            color: var(--primary);
         }
 
         /* 底部固定選單 */
@@ -155,8 +185,13 @@
         <div id="memberContainer" class="member-list"></div>
     </div>
 
-    <!-- 頁面二：彙整系統（即時點名狀況 + 連續3次「上課」請假預警） -->
+    <!-- 頁面二：彙整系統 -->
     <div id="page2" style="display: none;">
+        <!-- 🌟 高風險說明圖例標籤 -->
+        <div class="risk-notice-box">
+            <span>⚠️</span>
+            <span><strong>高風險：</strong>連續三堂課請假，請學員長關心</span>
+        </div>
         <div id="summaryContainer"></div>
     </div>
 </div>
@@ -239,7 +274,7 @@
         }
     }
 
-    // 🌟 白名單判定：僅欄位名稱包含「上課」二字，才納入高風險請假統計
+    // 白名單判定：僅欄位名稱包含「上課」二字，才納入高風險請假統計
     function checkHighRisk(memberRow) {
         const headers = rawData[0];
         let leaveCount = 0;
@@ -248,7 +283,6 @@
             const eventName = (headers[c] || "").toString().trim();
             const val = (memberRow[c] || "").toString().trim();
             
-            // 跳過非「上課」欄位（如：半日禪、活動、出遊等）
             if (!eventName.includes("上課")) {
                 continue; 
             }
@@ -257,7 +291,6 @@
                 leaveCount++;
                 if (leaveCount >= 3) return true;
             } else if (val !== "") {
-                // 正式上課有出席，即中斷連續請假累計
                 break; 
             }
         }
@@ -322,7 +355,7 @@
         }
     }
 
-    // 🌟 渲染頁面二：出席彙整系統（含中文組別自訂排序）
+    // 🌟 渲染頁面二：出席彙整系統（增加各組出席率與高風險說明）
     function renderPage2() {
         const container = document.getElementById('summaryContainer');
         const currentEvent = document.getElementById('eventSelect').value;
@@ -359,7 +392,6 @@
 
         container.innerHTML = '';
 
-        // 中文組別順序表
         const groupOrder = [
             "第一組", "第二組", "第三組", "第四組", "第五組",
             "第六組", "第七組", "第八組", "第九組", "第十組"
@@ -376,13 +408,26 @@
             const card = document.createElement('div');
             card.className = 'group-summary-card';
 
+            // 統計該組出席與點名進度
+            let totalMembers = members.length;
+            let checkedMembers = 0;
+            let attendedMembers = 0;
+
             let rowsHTML = members.map(m => {
                 const riskBadge = m.isRisk ? `<span class="risk-tag">高風險</span>` : '';
                 const dharmaHTML = m.dharmaName ? `(${m.dharmaName})` : '';
                 
                 let statusColor = '#2f3e46';
-                if (m.status === '請假' || m.status === '不參加') statusColor = '#d90429';
-                else if (m.status === '未點名') statusColor = '#94a3b8';
+                if (m.status === '請假' || m.status === '不參加') {
+                    statusColor = '#d90429';
+                    checkedMembers++;
+                } else if (m.status === '未點名') {
+                    statusColor = '#94a3b8';
+                } else {
+                    // 出席/大椰墊/靠背椅等
+                    checkedMembers++;
+                    attendedMembers++;
+                }
 
                 return `
                     <div class="member-summary-row">
@@ -395,12 +440,20 @@
                 `;
             }).join('');
 
+            // 計算出席率
+            const attendRate = totalMembers > 0 ? Math.round((attendedMembers / totalMembers) * 100) : 0;
+            const checkRate = totalMembers > 0 ? Math.round((checkedMembers / totalMembers) * 100) : 0;
+
             card.innerHTML = `
                 <div class="group-summary-title">
                     <span>${gName}</span>
-                    <span>共 ${members.length} 人</span>
+                    <span>共 ${totalMembers} 人</span>
                 </div>
                 <div>${rowsHTML}</div>
+                <div class="group-summary-footer">
+                    <span>已點名: <strong>${checkRate}%</strong> (${checkedMembers}/${totalMembers})</span>
+                    <span>出席率: <strong>${attendRate}%</strong></span>
+                </div>
             `;
             container.appendChild(card);
         });
