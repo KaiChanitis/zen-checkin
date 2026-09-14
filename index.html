@@ -12,6 +12,8 @@
             --card: #ffffff;
             --text: #2f3e46;
             --text-light: #6c757d;
+            --danger: #d90429;
+            --danger-bg: #ffedd5;
         }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
@@ -31,12 +33,77 @@
         h2 { text-align: center; color: var(--primary); margin-top: 5px; margin-bottom: 5px; font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; }
         .status-bar { text-align: center; font-size: 12px; color: var(--text-light); margin-bottom: 15px; height: 18px; font-weight: 500; }
         
+        /* 🌟 頂部頁籤切換 (Tabs) */
+        .tab-nav {
+            display: flex;
+            background: #e2eef0;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
         .search-container { margin-bottom: 15px; }
         .search-input {
             width: 100%; padding: 12px 16px; box-sizing: border-box; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 15px; outline: none; color: var(--text); box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); transition: border-color 0.2s;
         }
         .search-input:focus { border-color: var(--primary); }
 
+        /* 🌟 頁面二：彙整系統樣式 */
+        .group-summary-card {
+            background: #fafcfb;
+            border: 1px solid #e2eef0;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 15px;
+        }
+        .group-summary-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+        .member-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f4f2;
+        }
+        .member-summary-row:last-child { border-bottom: none; }
+        .risk-tag {
+            color: var(--danger);
+            font-weight: 700;
+            font-size: 12px;
+            background: #ffe3e3;
+            padding: 2px 6px;
+            border-radius: 6px;
+            margin-left: 6px;
+        }
+
+        /* 底部固定選單 */
         .bottom-panel {
             position: fixed; bottom: 0; left: 0; right: 0; background: rgba(234, 239, 236, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 12px 20px env(safe-area-inset-bottom, 12px) 20px; border-top: 1px solid #dee5e2; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 1000;
         }
@@ -53,51 +120,15 @@
         .member-dharma { color: var(--primary); font-size: 12px; margin-left: 6px; background: var(--primary-light); padding: 2px 6px; border-radius: 6px; font-weight: 500; }
         .badge { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #f0f4f1; color: #52796f; font-size: 11px; font-weight: 500; border: 1px solid #e1e8e4; }
         
-        /* 按鈕容器：允許長選項自動換行，增加上下間距讓立體陰影不重疊 */
         .btn-group { display: flex; gap: 10px; width: 100%; flex-wrap: wrap; padding: 4px 0; }
         
-        /* 🌟 平常沒點選：呈現微凸起的實體按鍵感 */
+        /* 立體 3D 按鈕樣式 */
         .status-btn { 
-            flex: 1; 
-            min-width: 75px; 
-            padding: 12px 5px; 
-            font-size: 14px; 
-            font-weight: 500; 
-            border: 1px solid #cbd5e1; 
-            background: #ffffff; 
-            color: var(--text-light); 
-            border-radius: 12px; 
-            cursor: pointer; 
-            text-align: center;
-            -webkit-tap-highlight-color: transparent;
-            
-            /* 利用下沉陰影與向上位移創造凸起高度 */
-            box-shadow: 0 4px 0px #cbd5e1, 0 4px 10px rgba(0, 0, 0, 0.05);
-            transform: translateY(-4px);
-            transition: all 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
+            flex: 1; min-width: 75px; padding: 12px 5px; font-size: 14px; font-weight: 500; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-light); border-radius: 12px; cursor: pointer; text-align: center; -webkit-tap-highlight-color: transparent; box-shadow: 0 4px 0px #cbd5e1, 0 4px 10px rgba(0, 0, 0, 0.05); transform: translateY(-4px); transition: all 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        
-        /* 手指剛按下去的未選取按鈕（短暫下沉彈性） */
-        .status-btn:active { 
-            transform: translateY(-1px);
-            box-shadow: 0 1px 0px #cbd5e1, 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        /* 🌟 點選後：呈現高質感深綠色、且完全下壓嵌入的狀態 */
+        .status-btn:active { transform: translateY(-1px); box-shadow: 0 1px 0px #cbd5e1, 0 2px 4px rgba(0, 0, 0, 0.05); }
         .status-btn.active { 
-            background: var(--primary) !important; 
-            color: #ffffff !important; 
-            border-color: var(--primary) !important; 
-            font-weight: 600; 
-            
-            /* 消除下方凸出陰影，改用內陰影，並向下壓回平面(0px) */
-            transform: translateY(0px) !important; 
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.3) !important; 
-        }
-        
-        /* 已點選的按鈕若再被按，維持壓著的狀態，不產生無謂的彈跳位移 */
-        .status-btn.active:active { 
-            transform: translateY(0px) !important; 
+            background: var(--primary) !important; color: #ffffff !important; border-color: var(--primary) !important; font-weight: 600; transform: translateY(0px) !important; box-shadow: inset 0 3px 6px rgba(0,0,0,0.3) !important; 
         }
 
         .loading-overlay { text-align: center; padding: 40px; color: var(--text-light); font-size: 14px; }
@@ -109,23 +140,36 @@
     <h2 id="activityTitle">活動點名載入中...</h2>
     <div id="statusMsg" class="status-bar">正在連線至雲端資料庫...</div>
 
-    <div class="search-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="🔍 輸入姓名或法名快速搜尋..." oninput="render()">
+    <!-- 🌟 切換頁籤 -->
+    <div class="tab-nav">
+        <button id="tab1Btn" class="tab-btn active" onclick="switchTab(1)">📝 點名登錄</button>
+        <button id="tab2Btn" class="tab-btn" onclick="switchTab(2)">📊 出席彙整與預警</button>
     </div>
 
-    <div id="loading" class="loading-overlay">🍵 靜心讀取名單中，請稍候...</div>
-    <div id="memberContainer" class="member-list"></div>
+    <!-- 🌟 頁面一：點名登錄系統 -->
+    <div id="page1">
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 輸入姓名或法名快速搜尋..." oninput="renderPage1()">
+        </div>
+        <div id="loading" class="loading-overlay">🍵 靜心讀取名單中，請稍候...</div>
+        <div id="memberContainer" class="member-list"></div>
+    </div>
+
+    <!-- 🌟 頁面二：彙整系統（即時點名狀況 + 連續3次請假預警） -->
+    <div id="page2" style="display: none;">
+        <div id="summaryContainer"></div>
+    </div>
 </div>
 
 <div class="bottom-panel">
     <div class="panel-grid">
         <div class="panel-field">
             <label>目前活動</label>
-            <select id="eventSelect" onchange="render()"></select>
+            <select id="eventSelect" onchange="renderCurrentTab()"></select>
         </div>
         <div class="panel-field">
             <label>組別篩選</label>
-            <select id="groupSelect" onchange="render()">
+            <select id="groupSelect" onchange="renderCurrentTab()">
                 <option value="全部">全部顯示</option>
                 <option value="第一組">第一組</option>
                 <option value="第二組">第二組</option>
@@ -147,6 +191,7 @@
 
     let rawData = [];
     let eventConfigs = [];
+    let currentTab = 1;
 
     async function init() {
         try {
@@ -165,13 +210,56 @@
 
             document.getElementById('loading').style.display = 'none';
             document.getElementById('statusMsg').innerText = "● 雲端資料庫同步成功";
-            render();
+            renderCurrentTab();
         } catch (e) {
             document.getElementById('statusMsg').innerText = "❌ 連線失敗，請檢查網路";
         }
     }
 
-    function render() {
+    function switchTab(tabNum) {
+        currentTab = tabNum;
+        document.getElementById('tab1Btn').classList.toggle('active', tabNum === 1);
+        document.getElementById('tab2Btn').classList.toggle('active', tabNum === 2);
+        
+        document.getElementById('page1').style.display = tabNum === 1 ? 'block' : 'none';
+        document.getElementById('page2').style.display = tabNum === 2 ? 'block' : 'none';
+        
+        renderCurrentTab();
+    }
+
+    function renderCurrentTab() {
+        const currentEvent = document.getElementById('eventSelect').value;
+        if (currentEvent) {
+            document.getElementById('activityTitle').innerText = currentEvent;
+        }
+        if (currentTab === 1) {
+            renderPage1();
+        } else {
+            renderPage2();
+        }
+    }
+
+    // 判斷某學員是否「連續3次請假」
+    function checkHighRisk(memberRow) {
+        const headers = rawData[0];
+        // 抓出所有活動列的索引 (從第 3 欄之後開始)
+        let leaveCount = 0;
+        
+        for (let c = headers.length - 1; c >= 3; c--) {
+            const val = (memberRow[c] || "").toString().trim();
+            if (val === "請假" || val === "不參加") {
+                leaveCount++;
+                if (leaveCount >= 3) return true;
+            } else if (val !== "") {
+                // 只要中間有一次出席或非請假狀態，連續就中斷
+                break;
+            }
+        }
+        return false;
+    }
+
+    // 🌟 渲染頁面一：點名登錄
+    function renderPage1() {
         const container = document.getElementById('memberContainer');
         const currentEvent = document.getElementById('eventSelect').value;
         const currentGroup = document.getElementById('groupSelect').value;
@@ -181,10 +269,8 @@
 
         const config = eventConfigs.find(e => e.name === currentEvent);
         const headers = rawData[0];
-        
         const eventColIndex = headers.findIndex(h => h && h.toString().trim() === currentEvent.trim());
         
-        document.getElementById('activityTitle').innerText = currentEvent;
         container.innerHTML = '';
 
         for(let i = 1; i < rawData.length; i++) {
@@ -199,15 +285,12 @@
             }
 
             const matchGroup = (currentGroup === "全部" || group === currentGroup);
-            const matchKeyword = (!keyword || 
-                                  name.toLowerCase().includes(keyword) || 
-                                  dharmaName.toLowerCase().includes(keyword));
+            const matchKeyword = (!keyword || name.toLowerCase().includes(keyword) || dharmaName.toLowerCase().includes(keyword));
 
             if (matchGroup && matchKeyword) {
                 const div = document.createElement('div');
                 div.className = 'member-item';
 
-                // 自動渲染該活動在試算表設定的所有自訂選項（大椰墊、靠背椅、參加等）
                 let buttonsHTML = config.options.map(opt => {
                     const isMatch = (currentStatus === opt.trim());
                     const isActive = isMatch ? 'active' : '';
@@ -233,18 +316,90 @@
         }
     }
 
+    // 🌟 渲染頁面二：出席彙整系統
+    function renderPage2() {
+        const container = document.getElementById('summaryContainer');
+        const currentEvent = document.getElementById('eventSelect').value;
+        const currentGroup = document.getElementById('groupSelect').value;
+        
+        if (!currentEvent || rawData.length === 0) return;
+
+        const headers = rawData[0];
+        const eventColIndex = headers.findIndex(h => h && h.toString().trim() === currentEvent.trim());
+
+        // 分組統計資料結構
+        const groups = {};
+
+        for (let i = 1; i < rawData.length; i++) {
+            const row = rawData[i];
+            const groupName = row[0] || "未分組";
+            const name = row[1];
+            const dharmaName = row[2] || '';
+            const status = eventColIndex !== -1 ? (row[eventColIndex] || "未點名").toString().trim() : "未點名";
+            const isRisk = checkHighRisk(row);
+
+            if (currentGroup !== "全部" && groupName !== currentGroup) continue;
+
+            if (!groups[groupName]) {
+                groups[groupName] = [];
+            }
+
+            groups[groupName].push({
+                name: name,
+                dharmaName: dharmaName,
+                status: status || "未點名",
+                isRisk: isRisk
+            });
+        }
+
+        container.innerHTML = '';
+
+        Object.keys(groups).sort().forEach(gName => {
+            const members = groups[gName];
+            const card = document.createElement('div');
+            card.className = 'group-summary-card';
+
+            let rowsHTML = members.map(m => {
+                const riskBadge = m.isRisk ? `<span class="risk-tag">高風險</span>` : '';
+                const dharmaHTML = m.dharmaName ? `(${m.dharmaName})` : '';
+                
+                // 狀態樣式調整
+                let statusColor = '#2f3e46';
+                if (m.status === '請假' || m.status === '不參加') statusColor = '#d90429';
+                else if (m.status === '未點名') statusColor = '#94a3b8';
+
+                return `
+                    <div class="member-summary-row">
+                        <div>
+                            <strong>${m.name}</strong> <small style="color:#6c757d">${dharmaHTML}</small>
+                            ${riskBadge}
+                        </div>
+                        <div style="font-weight: 600; color: ${statusColor};">${m.status}</div>
+                    </div>
+                `;
+            }).join('');
+
+            card.innerHTML = `
+                <div class="group-summary-title">
+                    <span>${gName}</span>
+                    <span>共 ${members.length} 人</span>
+                </div>
+                <div>${rowsHTML}</div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
     async function update(name, eventName, newVal, clickedBtn) {
         if (clickedBtn.classList.contains('active')) return;
 
         const btnGroup = clickedBtn.parentElement;
         const allBtns = btnGroup.querySelectorAll('.status-btn');
         
-        // 1. 樂觀更新：手指碰到的瞬間，無論字面內容是什麼，立馬壓下並轉為深綠色恆亮
         allBtns.forEach(btn => btn.classList.remove('active'));
         clickedBtn.classList.add('active');
         document.getElementById('statusMsg').innerText = `已變更 ${name} 至【${newVal}】，正在同步雲端...`;
 
-        // 2. 將新資料即時同步至前端網頁的內存快取中（確保搜尋、篩選切換時狀態不會消失）
         const headers = rawData[0];
         let eventColIndex = headers.findIndex(h => h && h.toString().trim() === eventName.trim());
         if (eventColIndex === -1) {
@@ -258,7 +413,6 @@
             }
         }
 
-        // 3. 在背景安靜發送至 Google 試算表後台
         try {
             fetch(API_URL, {
                 method: 'POST',
