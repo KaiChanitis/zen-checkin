@@ -33,7 +33,7 @@
         h2 { text-align: center; color: var(--primary); margin-top: 5px; margin-bottom: 5px; font-size: 1.4rem; font-weight: 700; }
         .status-bar { text-align: center; font-size: 12px; color: var(--text-light); margin-bottom: 15px; font-weight: 500; }
         
-        /* 頁籤切換 */
+        /* 頂部頁籤切換 */
         .tab-nav {
             display: flex;
             background: #e2eef0;
@@ -61,42 +61,46 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
 
-        /* 🌟 法務訊息卡片 (放在頁面一) */
-        .event-section-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 10px 0 8px 0;
+        /* ⛩️ 第一頁：法務資訊卡片與新增表單 */
+        .event-section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 12px;
+        }
+        .event-section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
         }
         .add-event-toggle {
             font-size: 12px;
             color: #52796f;
             cursor: pointer;
             text-decoration: underline;
+            font-weight: 600;
         }
         .event-card {
             background: #fdfbf7;
             border: 1px solid #f0e6d2;
             border-radius: 14px;
-            padding: 12px 14px;
-            margin-bottom: 12px;
+            padding: 14px;
+            margin-bottom: 14px;
             position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
         .event-header {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .event-date-badge {
             background: #b7094c;
             color: white;
             font-weight: 700;
             font-size: 11px;
-            padding: 3px 6px;
+            padding: 3px 7px;
             border-radius: 6px;
             white-space: nowrap;
         }
@@ -106,15 +110,15 @@
             color: #2b2d42;
         }
         .event-desc {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-light);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             line-height: 1.4;
         }
         .form-btn {
             display: block;
             width: 100%;
-            padding: 9px 0;
+            padding: 10px 0;
             text-align: center;
             background: var(--primary);
             color: white;
@@ -134,17 +138,15 @@
             font-size: 14px;
             cursor: pointer;
         }
-
-        /* 新增活動表單區域 */
         .add-event-form {
             background: #f8faf9;
             border: 1px dashed #2d6a4f;
             border-radius: 12px;
             padding: 12px;
             margin-bottom: 15px;
-            display: none; /* 預設隱藏，點擊再展開 */
+            display: none;
         }
-        .add-event-form input, .add-event-form textarea {
+        .add-event-form input {
             width: 100%;
             padding: 8px;
             margin-bottom: 8px;
@@ -155,7 +157,7 @@
         }
         .submit-event-btn {
             width: 100%;
-            padding: 8px;
+            padding: 9px;
             background: #52796f;
             color: white;
             border: none;
@@ -211,24 +213,24 @@
 <body>
 
 <div class="card">
-    <h2 id="activityTitle">禪修班雲端管理系統</h2>
+    <h2 id="activityTitle">精舍法務與管理系統</h2>
     <div id="statusMsg" class="status-bar">正在連線至雲端資料庫...</div>
 
-    <!-- 頂部雙頁籤切換 -->
+    <!-- 頂部三個獨立頁籤 -->
     <div class="tab-nav">
-        <button id="tab1Btn" class="tab-btn active" onclick="switchTab(1)">📝 點名與法務</button>
-        <button id="tab2Btn" class="tab-btn" onclick="switchTab(2)">📊 出席彙整</button>
+        <button id="tab1Btn" class="tab-btn active" onclick="switchTab(1)">⛩️ 法務資訊</button>
+        <button id="tab2Btn" class="tab-btn" onclick="switchTab(2)">📝 點名登錄</button>
+        <button id="tab3Btn" class="tab-btn" onclick="switchTab(3)">📊 出席彙整</button>
     </div>
 
-    <!-- 頁面一：點名登錄 + 法務訊息區域 -->
+    <!-- 第一頁：法務資訊與 Google 表單報名 -->
     <div id="page1">
-        <!-- ⛩️ 法務訊息區域 -->
-        <div class="event-section-title">
-            <span>⛩️ 最新法務與報名</span>
+        <div class="event-section-header">
+            <span class="event-section-title">最新法會與活動報名</span>
             <span class="add-event-toggle" onclick="toggleAddEventForm()">+ 新增活動</span>
         </div>
 
-        <!-- ➕ 新增活動輸入表單 (預設隱藏) -->
+        <!-- ➕ 新增活動表單 (預設隱藏) -->
         <div id="addEventForm" class="add-event-form">
             <input type="text" id="newEventDate" placeholder="日期 (例: 8/25 (日))">
             <input type="text" id="newEventTitle" placeholder="活動名稱 (例: 供佛齋僧法會)">
@@ -237,30 +239,30 @@
             <button class="submit-event-btn" onclick="addNewDharmaEvent()">發布活動</button>
         </div>
 
-        <!-- 卡片容器 -->
+        <!-- 活動卡片列表 -->
         <div id="dharmaEventContainer"></div>
+    </div>
 
-        <hr style="border: none; border-top: 1px solid #e2eef0; margin: 15px 0;">
-
-        <!-- 🔍 點名名單搜尋與列表 -->
+    <!-- 第二頁：點名登錄 -->
+    <div id="page2" style="display: none;">
         <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="🔍 輸入姓名或法名快速搜尋..." oninput="renderPage1()">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 輸入姓名或法名快速搜尋..." oninput="renderPage2()">
         </div>
         <div id="loading" class="loading-overlay">🍵 靜心讀取名單中，請稍候...</div>
         <div id="memberContainer" class="member-list"></div>
     </div>
 
-    <!-- 頁面二：出席彙整 -->
-    <div id="page2" style="display: none;">
+    <!-- 第三頁：出席彙整與高風險預警 -->
+    <div id="page3" style="display: none;">
         <div class="risk-notice-box">
-            <span>⚠️ <strong>高風險：</strong>連續三堂課請假，請學員長關心</span>
+            <span>⚠️ <strong>高風險：</strong>正課連續三堂請假，請學員長關心</span>
         </div>
         <div id="summaryContainer"></div>
     </div>
 </div>
 
-<!-- 底部固定選單 -->
-<div id="bottomPanel" class="bottom-panel">
+<!-- 底部固定選單 (僅在第二頁與第三頁點名相關功能時顯示) -->
+<div id="bottomPanel" class="bottom-panel" style="display: none;">
     <div class="panel-grid">
         <div class="panel-field">
             <label>目前點名活動</label>
@@ -288,7 +290,7 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxrrCkL3c7SnVn7LDqmN9yUH4SvjWcdbPW-rkjbem_gRfYRiSIMunP8uwudm_fkAnN5/exec";
 
-    // 預設法務活動 (若瀏覽器內無舊資料時使用)
+    // 預設法務活動
     const defaultDharmaEvents = [
         {
             date: "8/25 (日)",
@@ -305,6 +307,8 @@
 
     async function init() {
         try {
+            renderDharmaEvents();
+
             const res = await fetch(API_URL);
             const json = await res.json();
             rawData = json.members;
@@ -320,7 +324,6 @@
 
             document.getElementById('loading').style.display = 'none';
             document.getElementById('statusMsg').innerText = "● 雲端資料庫同步成功";
-            renderDharmaEvents();
             renderCurrentTab();
         } catch (e) {
             document.getElementById('statusMsg').innerText = "❌ 連線失敗，請檢查網路";
@@ -331,14 +334,19 @@
         currentTab = tabNum;
         document.getElementById('tab1Btn').classList.toggle('active', tabNum === 1);
         document.getElementById('tab2Btn').classList.toggle('active', tabNum === 2);
+        document.getElementById('tab3Btn').classList.toggle('active', tabNum === 3);
         
         document.getElementById('page1').style.display = tabNum === 1 ? 'block' : 'none';
         document.getElementById('page2').style.display = tabNum === 2 ? 'block' : 'none';
-        
+        document.getElementById('page3').style.display = tabNum === 3 ? 'block' : 'none';
+
+        // 僅在第二、三頁顯示底部篩選選單
+        document.getElementById('bottomPanel').style.display = (tabNum === 1) ? 'none' : 'block';
+
         renderCurrentTab();
     }
 
-    /* ⛩️ 法務活動管理邏輯 */
+    /* ⛩️ 第一頁：法務資訊管理邏輯 */
     function renderDharmaEvents() {
         const container = document.getElementById('dharmaEventContainer');
         container.innerHTML = '';
@@ -378,7 +386,6 @@
         dharmaEvents.unshift({ date: date, title: title, desc: desc, formUrl: url });
         localStorage.setItem('dharmaEvents', JSON.stringify(dharmaEvents));
         
-        // 清空輸入欄位並更新畫面
         document.getElementById('newEventDate').value = '';
         document.getElementById('newEventTitle').value = '';
         document.getElementById('newEventDesc').value = '';
@@ -397,9 +404,13 @@
 
     function renderCurrentTab() {
         const currentEvent = document.getElementById('eventSelect').value;
-        if (currentEvent) document.getElementById('activityTitle').innerText = currentEvent;
-        if (currentTab === 1) renderPage1();
-        else if (currentTab === 2) renderPage2();
+        if (currentTab === 1) {
+            document.getElementById('activityTitle').innerText = "精舍法務與報名";
+        } else {
+            if (currentEvent) document.getElementById('activityTitle').innerText = currentEvent;
+            if (currentTab === 2) renderPage2();
+            else if (currentTab === 3) renderPage3();
+        }
     }
 
     function checkHighRisk(memberRow) {
@@ -419,7 +430,8 @@
         return false;
     }
 
-    function renderPage1() {
+    /* 第二頁：點名登錄 */
+    function renderPage2() {
         const container = document.getElementById('memberContainer');
         const currentEvent = document.getElementById('eventSelect').value;
         const currentGroup = document.getElementById('groupSelect').value;
@@ -474,7 +486,8 @@
         }
     }
 
-    function renderPage2() {
+    /* 第三頁：出席彙整 */
+    function renderPage3() {
         const container = document.getElementById('summaryContainer');
         const currentEvent = document.getElementById('eventSelect').value;
         const currentGroup = document.getElementById('groupSelect').value;
