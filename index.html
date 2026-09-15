@@ -30,24 +30,25 @@
             border-radius: 20px; 
             box-shadow: 0 10px 30px rgba(45, 106, 79, 0.06); 
         }
-        h2 { text-align: center; color: var(--primary); margin-top: 5px; margin-bottom: 5px; font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; }
-        .status-bar { text-align: center; font-size: 12px; color: var(--text-light); margin-bottom: 15px; height: 18px; font-weight: 500; }
+        h2 { text-align: center; color: var(--primary); margin-top: 5px; margin-bottom: 5px; font-size: 1.4rem; font-weight: 700; }
+        .status-bar { text-align: center; font-size: 12px; color: var(--text-light); margin-bottom: 15px; font-weight: 500; }
         
-        /* 頂部頁籤切換 (Tabs) */
+        /* 頁籤切換 */
         .tab-nav {
             display: flex;
             background: #e2eef0;
             border-radius: 12px;
             padding: 4px;
             margin-bottom: 15px;
+            gap: 2px;
         }
         .tab-btn {
             flex: 1;
-            padding: 10px;
+            padding: 10px 4px;
             text-align: center;
             border: none;
             background: transparent;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-light);
             border-radius: 10px;
@@ -60,105 +61,148 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
 
-        .search-container { margin-bottom: 15px; }
-        .search-input {
-            width: 100%; padding: 12px 16px; box-sizing: border-box; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 15px; outline: none; color: var(--text); box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); transition: border-color 0.2s;
+        /* 🌟 法務訊息卡片 (放在頁面一) */
+        .event-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .search-input:focus { border-color: var(--primary); }
-
-        /* 🌟 高風險說明提示框 */
-        .risk-notice-box {
-            background: #fff5f5;
-            border: 1px solid #feb2b2;
-            color: #c53030;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 15px;
+        .add-event-toggle {
+            font-size: 12px;
+            color: #52796f;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .event-card {
+            background: #fdfbf7;
+            border: 1px solid #f0e6d2;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        .event-header {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            margin-bottom: 6px;
         }
-
-        /* 頁面二：彙整系統樣式 */
-        .group-summary-card {
-            background: #fafcfb;
-            border: 1px solid #e2eef0;
-            border-radius: 14px;
-            padding: 14px;
-            margin-bottom: 15px;
+        .event-date-badge {
+            background: #b7094c;
+            color: white;
+            font-weight: 700;
+            font-size: 11px;
+            padding: 3px 6px;
+            border-radius: 6px;
+            white-space: nowrap;
         }
-        .group-summary-title {
+        .event-title {
             font-size: 15px;
             font-weight: 700;
-            color: var(--primary);
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding-bottom: 6px;
-            border-bottom: 1px dashed #cbd5e1;
+            color: #2b2d42;
         }
-        .member-summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            font-size: 14px;
-            border-bottom: 1px solid #f0f4f2;
-        }
-        .member-summary-row:last-child { border-bottom: none; }
-        .risk-tag {
-            color: var(--danger);
-            font-weight: 700;
+        .event-desc {
             font-size: 12px;
-            background: var(--danger-bg);
-            padding: 2px 6px;
-            border-radius: 6px;
-            margin-left: 6px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .form-btn {
+            display: block;
+            width: 100%;
+            padding: 9px 0;
+            text-align: center;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        .delete-event-btn {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 14px;
+            cursor: pointer;
         }
 
-        /* 🌟 各組底部出席率統計列 */
-        .group-summary-footer {
-            margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px dashed #cbd5e1;
-            display: flex;
-            justify-content: space-between;
+        /* 新增活動表單區域 */
+        .add-event-form {
+            background: #f8faf9;
+            border: 1px dashed #2d6a4f;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: none; /* 預設隱藏，點擊再展開 */
+        }
+        .add-event-form input, .add-event-form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
             font-size: 13px;
-            color: var(--text-light);
+            box-sizing: border-box;
+        }
+        .submit-event-btn {
+            width: 100%;
+            padding: 8px;
+            background: #52796f;
+            color: white;
+            border: none;
+            border-radius: 6px;
             font-weight: 600;
+            cursor: pointer;
         }
-        .group-summary-footer strong {
-            color: var(--primary);
+
+        /* 搜尋框與名單列表 */
+        .search-container { margin-bottom: 15px; }
+        .search-input {
+            width: 100%; padding: 12px 16px; box-sizing: border-box; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 15px; outline: none; color: var(--text);
         }
+
+        /* 高風險與彙整卡片 */
+        .risk-notice-box {
+            background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; margin-bottom: 15px;
+        }
+        .group-summary-card {
+            background: #fafcfb; border: 1px solid #e2eef0; border-radius: 14px; padding: 14px; margin-bottom: 15px;
+        }
+        .group-summary-title { font-size: 15px; font-weight: 700; color: var(--primary); display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px dashed #cbd5e1; }
+        .member-summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; border-bottom: 1px solid #f0f4f2; }
+        .risk-tag { color: var(--danger); font-weight: 700; font-size: 12px; background: var(--danger-bg); padding: 2px 6px; border-radius: 6px; margin-left: 6px; }
+        .group-summary-footer { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; display: flex; justify-content: space-between; font-size: 13px; color: var(--text-light); font-weight: 600; }
 
         /* 底部固定選單 */
         .bottom-panel {
-            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(234, 239, 236, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 12px 20px env(safe-area-inset-bottom, 12px) 20px; border-top: 1px solid #dee5e2; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 1000;
+            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(234, 239, 236, 0.95); backdrop-filter: blur(10px); padding: 12px 20px env(safe-area-inset-bottom, 12px) 20px; border-top: 1px solid #dee5e2; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 1000;
         }
         .panel-grid { max-width: 500px; margin: 0 auto; display: flex; gap: 10px; }
         .panel-field { flex: 1; }
-        .panel-field label { display: block; font-size: 11px; font-weight: 600; color: #52796f; margin-bottom: 4px; text-transform: uppercase; }
-        .bottom-panel select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; font-size: 14px; outline: none; color: var(--text); }
+        .panel-field label { display: block; font-size: 11px; font-weight: 600; color: #52796f; margin-bottom: 4px; }
+        .bottom-panel select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; font-size: 14px; }
         
-        .member-item { display: flex; flex-direction: column; padding: 22px 8px 14px 8px; border-bottom: 1px solid #edf2f0; }
-        .member-item:last-child { border-bottom: none; }
-        .member-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .member-name { font-size: 17px; font-weight: 600; color: #222e35; letter-spacing: 0.5px; }
+        .member-item { display: flex; flex-direction: column; padding: 18px 8px 12px 8px; border-bottom: 1px solid #edf2f0; }
+        .member-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .member-name { font-size: 17px; font-weight: 600; color: #222e35; }
+        .member-dharma { color: var(--primary); font-size: 12px; margin-left: 6px; background: var(--primary-light); padding: 2px 6px; border-radius: 6px; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #f0f4f1; color: #52796f; font-size: 11px; }
+        .btn-group { display: flex; gap: 8px; width: 100%; }
         
-        .member-dharma { color: var(--primary); font-size: 12px; margin-left: 6px; background: var(--primary-light); padding: 2px 6px; border-radius: 6px; font-weight: 500; }
-        .badge { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #f0f4f1; color: #52796f; font-size: 11px; font-weight: 500; border: 1px solid #e1e8e4; }
-        
-        .btn-group { display: flex; gap: 10px; width: 100%; flex-wrap: wrap; padding: 4px 0; }
-        
-        /* 立體 3D 按鈕樣式 */
         .status-btn { 
-            flex: 1; min-width: 75px; padding: 12px 5px; font-size: 14px; font-weight: 500; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-light); border-radius: 12px; cursor: pointer; text-align: center; -webkit-tap-highlight-color: transparent; box-shadow: 0 4px 0px #cbd5e1, 0 4px 10px rgba(0, 0, 0, 0.05); transform: translateY(-4px); transition: all 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
+            flex: 1; min-width: 70px; padding: 10px 4px; font-size: 13px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-light); border-radius: 10px; cursor: pointer; text-align: center; box-shadow: 0 3px 0px #cbd5e1; transform: translateY(-3px); transition: all 0.1s;
         }
-        .status-btn:active { transform: translateY(-1px); box-shadow: 0 1px 0px #cbd5e1, 0 2px 4px rgba(0, 0, 0, 0.05); }
         .status-btn.active { 
-            background: var(--primary) !important; color: #ffffff !important; border-color: var(--primary) !important; font-weight: 600; transform: translateY(0px) !important; box-shadow: inset 0 3px 6px rgba(0,0,0,0.3) !important; 
+            background: var(--primary) !important; color: #ffffff !important; border-color: var(--primary) !important; font-weight: 600; transform: translateY(0px) !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3) !important; 
         }
 
         .loading-overlay { text-align: center; padding: 40px; color: var(--text-light); font-size: 14px; }
@@ -167,17 +211,38 @@
 <body>
 
 <div class="card">
-    <h2 id="activityTitle">活動點名載入中...</h2>
+    <h2 id="activityTitle">禪修班雲端管理系統</h2>
     <div id="statusMsg" class="status-bar">正在連線至雲端資料庫...</div>
 
-    <!-- 切換頁籤 -->
+    <!-- 頂部雙頁籤切換 -->
     <div class="tab-nav">
-        <button id="tab1Btn" class="tab-btn active" onclick="switchTab(1)">📝 點名登錄</button>
-        <button id="tab2Btn" class="tab-btn" onclick="switchTab(2)">📊 出席彙整與預警</button>
+        <button id="tab1Btn" class="tab-btn active" onclick="switchTab(1)">📝 點名與法務</button>
+        <button id="tab2Btn" class="tab-btn" onclick="switchTab(2)">📊 出席彙整</button>
     </div>
 
-    <!-- 頁面一：點名登錄系統 -->
+    <!-- 頁面一：點名登錄 + 法務訊息區域 -->
     <div id="page1">
+        <!-- ⛩️ 法務訊息區域 -->
+        <div class="event-section-title">
+            <span>⛩️ 最新法務與報名</span>
+            <span class="add-event-toggle" onclick="toggleAddEventForm()">+ 新增活動</span>
+        </div>
+
+        <!-- ➕ 新增活動輸入表單 (預設隱藏) -->
+        <div id="addEventForm" class="add-event-form">
+            <input type="text" id="newEventDate" placeholder="日期 (例: 8/25 (日))">
+            <input type="text" id="newEventTitle" placeholder="活動名稱 (例: 供佛齋僧法會)">
+            <input type="text" id="newEventDesc" placeholder="活動簡介 (例: 歡迎踴躍報名參加)">
+            <input type="text" id="newEventUrl" placeholder="Google 表單網址 (https://...)">
+            <button class="submit-event-btn" onclick="addNewDharmaEvent()">發布活動</button>
+        </div>
+
+        <!-- 卡片容器 -->
+        <div id="dharmaEventContainer"></div>
+
+        <hr style="border: none; border-top: 1px solid #e2eef0; margin: 15px 0;">
+
+        <!-- 🔍 點名名單搜尋與列表 -->
         <div class="search-container">
             <input type="text" id="searchInput" class="search-input" placeholder="🔍 輸入姓名或法名快速搜尋..." oninput="renderPage1()">
         </div>
@@ -185,21 +250,20 @@
         <div id="memberContainer" class="member-list"></div>
     </div>
 
-    <!-- 頁面二：彙整系統 -->
+    <!-- 頁面二：出席彙整 -->
     <div id="page2" style="display: none;">
-        <!-- 🌟 高風險說明圖例標籤 -->
         <div class="risk-notice-box">
-            <span>⚠️</span>
-            <span><strong>高風險：</strong>連續三堂課請假，請學員長關心</span>
+            <span>⚠️ <strong>高風險：</strong>連續三堂課請假，請學員長關心</span>
         </div>
         <div id="summaryContainer"></div>
     </div>
 </div>
 
-<div class="bottom-panel">
+<!-- 底部固定選單 -->
+<div id="bottomPanel" class="bottom-panel">
     <div class="panel-grid">
         <div class="panel-field">
-            <label>目前活動</label>
+            <label>目前點名活動</label>
             <select id="eventSelect" onchange="renderCurrentTab()"></select>
         </div>
         <div class="panel-field">
@@ -224,6 +288,17 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxrrCkL3c7SnVn7LDqmN9yUH4SvjWcdbPW-rkjbem_gRfYRiSIMunP8uwudm_fkAnN5/exec";
 
+    // 預設法務活動 (若瀏覽器內無舊資料時使用)
+    const defaultDharmaEvents = [
+        {
+            date: "8/25 (日)",
+            title: "供佛齋僧法會",
+            desc: "廣植福田，報答父母師長深恩。歡迎踴躍報名參加供僧與義工護持。",
+            formUrl: "https://forms.google.com"
+        }
+    ];
+
+    let dharmaEvents = JSON.parse(localStorage.getItem('dharmaEvents')) || defaultDharmaEvents;
     let rawData = [];
     let eventConfigs = [];
     let currentTab = 1;
@@ -245,6 +320,7 @@
 
             document.getElementById('loading').style.display = 'none';
             document.getElementById('statusMsg').innerText = "● 雲端資料庫同步成功";
+            renderDharmaEvents();
             renderCurrentTab();
         } catch (e) {
             document.getElementById('statusMsg').innerText = "❌ 連線失敗，請檢查網路";
@@ -262,31 +338,77 @@
         renderCurrentTab();
     }
 
-    function renderCurrentTab() {
-        const currentEvent = document.getElementById('eventSelect').value;
-        if (currentEvent) {
-            document.getElementById('activityTitle').innerText = currentEvent;
+    /* ⛩️ 法務活動管理邏輯 */
+    function renderDharmaEvents() {
+        const container = document.getElementById('dharmaEventContainer');
+        container.innerHTML = '';
+
+        dharmaEvents.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            card.innerHTML = `
+                <button class="delete-event-btn" onclick="deleteDharmaEvent(${index})">✕</button>
+                <div class="event-header">
+                    <span class="event-date-badge">${item.date}</span>
+                    <span class="event-title">${item.title}</span>
+                </div>
+                <div class="event-desc">${item.desc}</div>
+                <a href="${item.formUrl}" target="_blank" class="form-btn">👉 點此前往 Google 表單報名</a>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function toggleAddEventForm() {
+        const form = document.getElementById('addEventForm');
+        form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function addNewDharmaEvent() {
+        const date = document.getElementById('newEventDate').value.trim();
+        const title = document.getElementById('newEventTitle').value.trim();
+        const desc = document.getElementById('newEventDesc').value.trim();
+        const url = document.getElementById('newEventUrl').value.trim();
+
+        if (!date || !title || !url) {
+            alert('請填寫日期、標題與 Google 表單網址！');
+            return;
         }
-        if (currentTab === 1) {
-            renderPage1();
-        } else {
-            renderPage2();
+
+        dharmaEvents.unshift({ date: date, title: title, desc: desc, formUrl: url });
+        localStorage.setItem('dharmaEvents', JSON.stringify(dharmaEvents));
+        
+        // 清空輸入欄位並更新畫面
+        document.getElementById('newEventDate').value = '';
+        document.getElementById('newEventTitle').value = '';
+        document.getElementById('newEventDesc').value = '';
+        document.getElementById('newEventUrl').value = '';
+        toggleAddEventForm();
+        renderDharmaEvents();
+    }
+
+    function deleteDharmaEvent(index) {
+        if (confirm('確定要刪除這項法務訊息嗎？')) {
+            dharmaEvents.splice(index, 1);
+            localStorage.setItem('dharmaEvents', JSON.stringify(dharmaEvents));
+            renderDharmaEvents();
         }
     }
 
-    // 白名單判定：僅欄位名稱包含「上課」二字，才納入高風險請假統計
+    function renderCurrentTab() {
+        const currentEvent = document.getElementById('eventSelect').value;
+        if (currentEvent) document.getElementById('activityTitle').innerText = currentEvent;
+        if (currentTab === 1) renderPage1();
+        else if (currentTab === 2) renderPage2();
+    }
+
     function checkHighRisk(memberRow) {
         const headers = rawData[0];
         let leaveCount = 0;
-        
         for (let c = headers.length - 1; c >= 3; c--) {
             const eventName = (headers[c] || "").toString().trim();
             const val = (memberRow[c] || "").toString().trim();
-            
-            if (!eventName.includes("上課")) {
-                continue; 
-            }
-
+            if (!eventName.includes("上課")) continue; 
             if (val === "請假" || val === "不參加") {
                 leaveCount++;
                 if (leaveCount >= 3) return true;
@@ -297,7 +419,6 @@
         return false;
     }
 
-    // 渲染頁面一：點名登錄
     function renderPage1() {
         const container = document.getElementById('memberContainer');
         const currentEvent = document.getElementById('eventSelect').value;
@@ -333,7 +454,7 @@
                 let buttonsHTML = config.options.map(opt => {
                     const isMatch = (currentStatus === opt.trim());
                     const isActive = isMatch ? 'active' : '';
-                    return `<button class="status-btn ${isActive}" data-val="${opt}" onclick="update('${name}', '${currentEvent}', '${opt}', this)">${opt}</button>`;
+                    return `<button class="status-btn ${isActive}" onclick="update('${name}', '${currentEvent}', '${opt}', this)">${opt}</button>`;
                 }).join('');
 
                 const dharmaHTML = dharmaName ? `<span class="member-dharma">${dharmaName}</span>` : '';
@@ -346,16 +467,13 @@
                         </div>
                         <div class="badge">${group}</div>
                     </div>
-                    <div class="btn-group">
-                        ${buttonsHTML}
-                    </div>
+                    <div class="btn-group">${buttonsHTML}</div>
                 `;
                 container.appendChild(div);
             }
         }
     }
 
-    // 🌟 渲染頁面二：出席彙整系統（增加各組出席率與高風險說明）
     function renderPage2() {
         const container = document.getElementById('summaryContainer');
         const currentEvent = document.getElementById('eventSelect').value;
@@ -365,7 +483,6 @@
 
         const headers = rawData[0];
         const eventColIndex = headers.findIndex(h => h && h.toString().trim() === currentEvent.trim());
-
         const groups = {};
 
         for (let i = 1; i < rawData.length; i++) {
@@ -377,78 +494,48 @@
             const isRisk = checkHighRisk(row);
 
             if (currentGroup !== "全部" && groupName !== currentGroup) continue;
+            if (!groups[groupName]) groups[groupName] = [];
 
-            if (!groups[groupName]) {
-                groups[groupName] = [];
-            }
-
-            groups[groupName].push({
-                name: name,
-                dharmaName: dharmaName,
-                status: status || "未點名",
-                isRisk: isRisk
-            });
+            groups[groupName].push({ name, dharmaName, status, isRisk });
         }
 
         container.innerHTML = '';
-
-        const groupOrder = [
-            "第一組", "第二組", "第三組", "第四組", "第五組",
-            "第六組", "第七組", "第八組", "第九組", "第十組"
-        ];
+        const groupOrder = ["第一組", "第二組", "第三組", "第四組", "第五組", "第六組", "第七組", "第八組", "第九組", "第十組"];
 
         Object.keys(groups).sort((a, b) => {
-            let indexA = groupOrder.indexOf(a);
-            let indexB = groupOrder.indexOf(b);
-            if (indexA === -1) indexA = 99;
-            if (indexB === -1) indexB = 99;
-            return indexA - indexB;
+            let indexA = groupOrder.indexOf(a), indexB = groupOrder.indexOf(b);
+            return (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
         }).forEach(gName => {
             const members = groups[gName];
             const card = document.createElement('div');
             card.className = 'group-summary-card';
 
-            // 統計該組出席與點名進度
-            let totalMembers = members.length;
-            let checkedMembers = 0;
-            let attendedMembers = 0;
+            let totalMembers = members.length, checkedMembers = 0, attendedMembers = 0;
 
             let rowsHTML = members.map(m => {
                 const riskBadge = m.isRisk ? `<span class="risk-tag">高風險</span>` : '';
                 const dharmaHTML = m.dharmaName ? `(${m.dharmaName})` : '';
-                
                 let statusColor = '#2f3e46';
                 if (m.status === '請假' || m.status === '不參加') {
-                    statusColor = '#d90429';
-                    checkedMembers++;
+                    statusColor = '#d90429'; checkedMembers++;
                 } else if (m.status === '未點名') {
                     statusColor = '#94a3b8';
                 } else {
-                    // 出席/大椰墊/靠背椅等
-                    checkedMembers++;
-                    attendedMembers++;
+                    checkedMembers++; attendedMembers++;
                 }
-
                 return `
                     <div class="member-summary-row">
-                        <div>
-                            <strong>${m.name}</strong> <small style="color:#6c757d">${dharmaHTML}</small>
-                            ${riskBadge}
-                        </div>
+                        <div><strong>${m.name}</strong> <small style="color:#6c757d">${dharmaHTML}</small>${riskBadge}</div>
                         <div style="font-weight: 600; color: ${statusColor};">${m.status}</div>
                     </div>
                 `;
             }).join('');
 
-            // 計算出席率
             const attendRate = totalMembers > 0 ? Math.round((attendedMembers / totalMembers) * 100) : 0;
             const checkRate = totalMembers > 0 ? Math.round((checkedMembers / totalMembers) * 100) : 0;
 
             card.innerHTML = `
-                <div class="group-summary-title">
-                    <span>${gName}</span>
-                    <span>共 ${totalMembers} 人</span>
-                </div>
+                <div class="group-summary-title"><span>${gName}</span><span>共 ${totalMembers} 人</span></div>
                 <div>${rowsHTML}</div>
                 <div class="group-summary-footer">
                     <span>已點名: <strong>${checkRate}%</strong> (${checkedMembers}/${totalMembers})</span>
@@ -463,9 +550,7 @@
         if (clickedBtn.classList.contains('active')) return;
 
         const btnGroup = clickedBtn.parentElement;
-        const allBtns = btnGroup.querySelectorAll('.status-btn');
-        
-        allBtns.forEach(btn => btn.classList.remove('active'));
+        btnGroup.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active'));
         clickedBtn.classList.add('active');
         document.getElementById('statusMsg').innerText = `已變更 ${name} 至【${newVal}】，正在同步雲端...`;
 
@@ -476,10 +561,7 @@
             eventColIndex = headers.length - 1;
         }
         for(let i = 1; i < rawData.length; i++){
-            if(rawData[i][1] === name) { 
-                rawData[i][eventColIndex] = newVal; 
-                break; 
-            }
+            if(rawData[i][1] === name) { rawData[i][eventColIndex] = newVal; break; }
         }
 
         try {
@@ -491,7 +573,6 @@
                 document.getElementById('statusMsg').innerText = `✅ ${name} 已成功同步至雲端試算表`;
             });
         } catch (e) {
-            console.error(e);
             document.getElementById('statusMsg').innerText = `⚠️ 背景同步可能受阻，請重新整理網頁`;
         }
     }
