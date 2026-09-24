@@ -417,9 +417,7 @@
         const headers = rawData[0];
         let leaveCount = 0;
         for (let c = headers.length - 1; c >= 3; c--) {
-            const eventName = (headers[c] || "").toString().trim();
             const val = (memberRow[c] || "").toString().trim();
-            if (!eventName.includes("上課")) continue; 
             if (val === "請假" || val === "不參加") {
                 leaveCount++;
                 if (leaveCount >= 3) return true;
@@ -430,7 +428,7 @@
         return false;
     }
 
-    /* 第二頁：點名登錄 */
+    /* 第二頁：點名登錄 (含自動過濾無效空白列) */
     function renderPage2() {
         const container = document.getElementById('memberContainer');
         const currentEvent = document.getElementById('eventSelect').value;
@@ -450,6 +448,9 @@
             const group = row[0];
             const name = row[1];
             const dharmaName = row[2] || '';
+
+            // 🛡️ 過濾空白：若無姓名或姓名全為空白，直接跳過不繪製卡片
+            if (!name || name.toString().trim() === '') continue;
             
             let currentStatus = '';
             if (eventColIndex !== -1 && row[eventColIndex] !== undefined && row[eventColIndex] !== null) {
@@ -486,7 +487,7 @@
         }
     }
 
-    /* 第三頁：出席彙整 */
+    /* 第三頁：出席彙整 (含自動過濾無效空白列) */
     function renderPage3() {
         const container = document.getElementById('summaryContainer');
         const currentEvent = document.getElementById('eventSelect').value;
@@ -503,6 +504,10 @@
             const groupName = row[0] || "未分組";
             const name = row[1];
             const dharmaName = row[2] || '';
+
+            // 🛡️ 過濾空白：若無姓名或姓名全為空白，直接跳過不計入彙整
+            if (!name || name.toString().trim() === '') continue;
+
             const status = eventColIndex !== -1 ? (row[eventColIndex] || "未點名").toString().trim() : "未點名";
             const isRisk = checkHighRisk(row);
 
