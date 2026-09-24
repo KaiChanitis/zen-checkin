@@ -223,7 +223,7 @@
         <button id="tab3Btn" class="tab-btn" onclick="switchTab(3)">📊 出席彙整</button>
     </div>
 
-    <!-- 第一頁：法務資訊與 Google 表單報名 -->
+    <!-- 第一頁：法務資訊與 Google 表單報名 (雲端同步版) -->
     <div id="page1">
         <div class="event-section-header">
             <span class="event-section-title">最新法會與活動報名</span>
@@ -236,7 +236,7 @@
             <input type="text" id="newEventTitle" placeholder="活動名稱 (例: 供佛齋僧法會)">
             <input type="text" id="newEventDesc" placeholder="活動簡介 (例: 歡迎踴躍報名參加)">
             <input type="text" id="newEventUrl" placeholder="Google 表單網址 (https://...)">
-            <button class="submit-event-btn" onclick="addNewDharmaEvent()">發布活動</button>
+            <button class="submit-event-btn" onclick="addNewDharmaEvent()">同步發布至雲端</button>
         </div>
 
         <!-- 活動卡片列表 -->
@@ -261,7 +261,7 @@
     </div>
 </div>
 
-<!-- 底部固定選單 (僅在第二頁與第三頁點名相關功能時顯示) -->
+<!-- 底部固定選單 -->
 <div id="bottomPanel" class="bottom-panel" style="display: none;">
     <div class="panel-grid">
         <div class="panel-field">
@@ -290,29 +290,19 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxrrCkL3c7SnVn7LDqmN9yUH4SvjWcdbPW-rkjbem_gRfYRiSIMunP8uwudm_fkAnN5/exec";
 
-    // 預設法務活動
-    const defaultDharmaEvents = [
-        {
-            date: "8/25 (日)",
-            title: "供佛齋僧法會",
-            desc: "廣植福田，報答父母師長深恩。歡迎踴躍報名參加供僧與義工護持。",
-            formUrl: "https://forms.google.com"
-        }
-    ];
-
-    let dharmaEvents = JSON.parse(localStorage.getItem('dharmaEvents')) || defaultDharmaEvents;
+    let dharmaEvents = [];
     let rawData = [];
     let eventConfigs = [];
     let currentTab = 1;
 
     async function init() {
         try {
-            renderDharmaEvents();
-
             const res = await fetch(API_URL);
             const json = await res.json();
-            rawData = json.members;
-            eventConfigs = json.events;
+            
+            rawData = json.members || [];
+            eventConfigs = json.events || [];
+            dharmaEvents = json.dharmaEvents || []; // 雲端法務活動資料
 
             const evSel = document.getElementById('eventSelect');
             evSel.innerHTML = '';
@@ -324,6 +314,7 @@
 
             document.getElementById('loading').style.display = 'none';
             document.getElementById('statusMsg').innerText = "● 雲端資料庫同步成功";
+            renderDharmaEvents();
             renderCurrentTab();
         } catch (e) {
             document.getElementById('statusMsg').innerText = "❌ 連線失敗，請檢查網路";
@@ -340,22 +331,26 @@
         document.getElementById('page2').style.display = tabNum === 2 ? 'block' : 'none';
         document.getElementById('page3').style.display = tabNum === 3 ? 'block' : 'none';
 
-        // 僅在第二、三頁顯示底部篩選選單
         document.getElementById('bottomPanel').style.display = (tabNum === 1) ? 'none' : 'block';
 
         renderCurrentTab();
     }
 
-    /* ⛩️ 第一頁：法務資訊管理邏輯 */
+    /* ⛩️ 第一頁：法務資訊管理邏輯 (雲端全體同步) */
     function renderDharmaEvents() {
         const container = document.getElementById('dharmaEventContainer');
         container.innerHTML = '';
 
-        dharmaEvents.forEach((item, index) => {
+        if (dharmaEvents.length === 0) {
+            container.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:20px; font-size:13px;">目前尚無發布的法務訊息</div>`;
+            return;
+        }
+
+        dharmaEvents.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'event-card';
             card.innerHTML = `
-                <button class="delete-event-btn" onclick="deleteDharmaEvent(${index})">✕</button>
+                <button class="delete-event-btn" onclick="deleteDharmaEvent(${item.id})">✕</button>
                 <div class="event-header">
                     <span class="event-date-badge">${item.date}</span>
                     <span class="event-title">${item.title}</span>
@@ -372,7 +367,7 @@
         form.style.display = (form.style.display === 'block') ? 'none' : 'block';
     }
 
-    function addNewDharmaEvent() {
+    async function addNewDharmaEvent() {
         const date = document.getElementById('newEventDate').value.trim();
         const title = document.getElementById('newEventTitle').value.trim();
         const desc = document.getElementById('newEventDesc').value.trim();
@@ -383,22 +378,51 @@
             return;
         }
 
-        dharmaEvents.unshift({ date: date, title: title, desc: desc, formUrl: url });
-        localStorage.setItem('dharmaEvents', JSON.stringify(dharmaEvents));
-        
-        document.getElementById('newEventDate').value = '';
-        document.getElementById('newEventTitle').value = '';
-        document.getElementById('newEventDesc').value = '';
-        document.getElementById('newEventUrl').value = '';
-        toggleAddEventForm();
-        renderDharmaEvents();
+        document.getElementById('statusMsg').innerText = "正在新增法務活動至雲端...";
+
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action: "addDharmaEvent",
+                    date: date,
+                    title: title,
+                    desc: desc,
+                    formUrl: url
+                })
+            });
+
+            alert('✅ 活動已成功新增至雲端！');
+            document.getElementById('newEventDate').value = '';
+            document.getElementById('newEventTitle').value = '';
+            document.getElementById('newEventDesc').value = '';
+            document.getElementById('newEventUrl').value = '';
+            toggleAddEventForm();
+            init(); // 重新讀取雲端最新資料
+        } catch(e) {
+            alert('❌ 新增失敗，請檢查網路。');
+        }
     }
 
-    function deleteDharmaEvent(index) {
-        if (confirm('確定要刪除這項法務訊息嗎？')) {
-            dharmaEvents.splice(index, 1);
-            localStorage.setItem('dharmaEvents', JSON.stringify(dharmaEvents));
-            renderDharmaEvents();
+    async function deleteDharmaEvent(rowId) {
+        if (confirm('確定要從雲端同步刪除這項法務訊息嗎？（刪除後所有人皆無法看到）')) {
+            document.getElementById('statusMsg').innerText = "正在從雲端刪除活動...";
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        action: "deleteDharmaEvent",
+                        rowId: rowId
+                    })
+                });
+
+                alert('✅ 活動已成功從雲端刪除！');
+                init(); // 重新讀取雲端最新資料
+            } catch(e) {
+                alert('❌ 刪除失敗，請檢查網路。');
+            }
         }
     }
 
@@ -449,7 +473,6 @@
             const name = row[1];
             const dharmaName = row[2] || '';
 
-            // 🛡️ 過濾空白：若無姓名或姓名全為空白，直接跳過不繪製卡片
             if (!name || name.toString().trim() === '') continue;
             
             let currentStatus = '';
@@ -505,7 +528,6 @@
             const name = row[1];
             const dharmaName = row[2] || '';
 
-            // 🛡️ 過濾空白：若無姓名或姓名全為空白，直接跳過不計入彙整
             if (!name || name.toString().trim() === '') continue;
 
             const status = eventColIndex !== -1 ? (row[eventColIndex] || "未點名").toString().trim() : "未點名";
