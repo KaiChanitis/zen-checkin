@@ -287,7 +287,6 @@
 
     <!-- 第三頁：出席彙整與高風險預警 -->
     <div id="page3" style="display: none;">
-        <!-- 🌟 最上方：全體總計統計卡片 -->
         <div id="overallSummaryBox" class="overall-summary-card"></div>
 
         <div class="risk-notice-box">
@@ -356,11 +355,12 @@
             const evSel = document.getElementById('eventSelect');
             evSel.innerHTML = '';
 
-            if (rawData.length > 0) {
+            // 🛡️ 嚴格對照：如果「設定」分頁完全沒資料，才備用自動讀取 headers
+            if (eventConfigs.length === 0 && rawData.length > 0) {
                 const headers = rawData[0];
                 for (let c = 3; c < headers.length; c++) {
                     const headerName = headers[c] ? headers[c].toString().trim() : '';
-                    if (headerName && !eventConfigs.some(e => e.name === headerName)) {
+                    if (headerName) {
                         eventConfigs.push({
                             name: headerName,
                             options: ['出席', '請假', '不參加']
@@ -582,7 +582,6 @@
         }
     }
 
-    /* 第三頁：出席彙整（新增頂部全體總計統計） */
     function renderPage3() {
         const container = document.getElementById('summaryContainer');
         const overallBox = document.getElementById('overallSummaryBox');
@@ -599,7 +598,6 @@
         const eventColIndex = headers.findIndex(h => h && h.toString().trim() === currentEvent.trim());
         const groups = {};
 
-        // 統計總變數
         let totalAll = 0;
         let checkedAll = 0;
         let attendedAll = 0;
@@ -617,7 +615,6 @@
 
             if (currentGroup !== "全部" && groupName !== currentGroup) continue;
 
-            // 累加總統計
             totalAll++;
             if (status === '請假' || status === '不參加') {
                 checkedAll++;
@@ -630,7 +627,6 @@
             groups[groupName].push({ name, dharmaName, status, isRisk });
         }
 
-        // 🌟 渲染頂部「總計統計卡片」
         const overallRate = totalAll > 0 ? Math.round((attendedAll / totalAll) * 100) : 0;
         const groupLabel = (currentGroup === "全部") ? "全體學員總計" : `${currentGroup}總計`;
 
