@@ -173,6 +173,39 @@
         }
 
         /* 高風險與彙整卡片 */
+        .overall-summary-card {
+            background: linear-gradient(135deg, #2d6a4f, #1b4332);
+            color: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 16px rgba(45, 106, 79, 0.2);
+        }
+        .overall-title {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .overall-grid {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .overall-item-val {
+            font-size: 22px;
+            font-weight: 800;
+            color: #d8f3dc;
+        }
+        .overall-item-lbl {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
         .risk-notice-box {
             background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; margin-bottom: 15px;
         }
@@ -254,6 +287,9 @@
 
     <!-- 第三頁：出席彙整與高風險預警 -->
     <div id="page3" style="display: none;">
+        <!-- 🌟 最上方：全體總計統計卡片 -->
+        <div id="overallSummaryBox" class="overall-summary-card"></div>
+
         <div class="risk-notice-box">
             <span>⚠️ <strong>高風險：</strong>連續三堂請假，請學員長關心</span>
         </div>
@@ -320,7 +356,6 @@
             const evSel = document.getElementById('eventSelect');
             evSel.innerHTML = '';
 
-            // 如果後端有傳回標題（headers），且 events 清單為空，自動建置選單選項
             if (rawData.length > 0) {
                 const headers = rawData[0];
                 for (let c = 3; c < headers.length; c++) {
@@ -547,17 +582,27 @@
         }
     }
 
+    /* 第三頁：出席彙整（新增頂部全體總計統計） */
     function renderPage3() {
         const container = document.getElementById('summaryContainer');
+        const overallBox = document.getElementById('overallSummaryBox');
         const currentEvent = document.getElementById('eventSelect').value;
         const currentGroup = document.getElementById('groupSelect').value;
         
         container.innerHTML = '';
-        if (!currentEvent || rawData.length <= 1) return;
+        if (!currentEvent || rawData.length <= 1) {
+            overallBox.style.display = 'none';
+            return;
+        }
 
         const headers = rawData[0];
         const eventColIndex = headers.findIndex(h => h && h.toString().trim() === currentEvent.trim());
         const groups = {};
+
+        // 統計總變數
+        let totalAll = 0;
+        let checkedAll = 0;
+        let attendedAll = 0;
 
         for (let i = 1; i < rawData.length; i++) {
             const row = rawData[i];
@@ -571,10 +616,45 @@
             const isRisk = checkHighRisk(row);
 
             if (currentGroup !== "全部" && groupName !== currentGroup) continue;
-            if (!groups[groupName]) groups[groupName] = [];
 
+            // 累加總統計
+            totalAll++;
+            if (status === '請假' || status === '不參加') {
+                checkedAll++;
+            } else if (status !== '未點名' && status !== '') {
+                checkedAll++;
+                attendedAll++;
+            }
+
+            if (!groups[groupName]) groups[groupName] = [];
             groups[groupName].push({ name, dharmaName, status, isRisk });
         }
+
+        // 🌟 渲染頂部「總計統計卡片」
+        const overallRate = totalAll > 0 ? Math.round((attendedAll / totalAll) * 100) : 0;
+        const groupLabel = (currentGroup === "全部") ? "全體學員總計" : `${currentGroup}總計`;
+
+        overallBox.style.display = 'block';
+        overallBox.innerHTML = `
+            <div class="overall-title">
+                <span>📈 ${groupLabel}</span>
+                <span>${attendedAll} / ${totalAll} 人出席</span>
+            </div>
+            <div class="overall-grid">
+                <div>
+                    <div class="overall-item-val">${totalAll}</div>
+                    <div class="overall-item-lbl">總人數</div>
+                </div>
+                <div>
+                    <div class="overall-item-val">${attendedAll}</div>
+                    <div class="overall-item-lbl">出席人數</div>
+                </div>
+                <div>
+                    <div class="overall-item-val">${overallRate}%</div>
+                    <div class="overall-item-lbl">總出席率</div>
+                </div>
+            </div>
+        `;
 
         const groupOrder = ["第一組", "第二組", "第三組", "第四組", "第五組", "第六組", "第七組", "第八組", "第九組", "第十組"];
 
