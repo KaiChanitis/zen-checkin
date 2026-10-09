@@ -172,7 +172,7 @@
             width: 100%; padding: 12px 16px; box-sizing: border-box; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 15px; outline: none; color: var(--text);
         }
 
-        /* 高風險與彙整卡片 */
+        /* 頂部總出席彙整卡片 */
         .overall-summary-card {
             background: linear-gradient(135deg, #2d6a4f, #1b4332);
             color: white;
@@ -241,6 +241,37 @@
         }
 
         .loading-overlay { text-align: center; padding: 40px; color: var(--text-light); font-size: 14px; }
+
+        /* 🌟 浮動一鍵回頂部按鈕 (Back to Top) */
+        .back-to-top {
+            position: fixed;
+            bottom: 85px; /* 位於底部選單上方 */
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+            z-index: 999;
+        }
+        .back-to-top.show {
+            opacity: 0.92;
+            visibility: visible;
+        }
+        .back-to-top:active {
+            transform: scale(0.92);
+        }
     </style>
 </head>
 <body>
@@ -296,6 +327,9 @@
     </div>
 </div>
 
+<!-- 🌟 浮動一鍵回頂部按鈕 -->
+<button id="backToTopBtn" class="back-to-top" onclick="scrollToTop()">▲</button>
+
 <!-- 底部固定選單 -->
 <div id="bottomPanel" class="bottom-panel" style="display: none;">
     <div class="panel-grid">
@@ -330,6 +364,23 @@
     let eventConfigs = [];
     let currentTab = 1;
 
+    // 🌟 懸浮按鈕滾動監聽邏輯
+    window.onscroll = function() {
+        const topBtn = document.getElementById("backToTopBtn");
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            topBtn.classList.add("show");
+        } else {
+            topBtn.classList.remove("show");
+        }
+    };
+
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+
     function formatDateString(str) {
         if (!str) return '';
         const d = new Date(str);
@@ -355,7 +406,6 @@
             const evSel = document.getElementById('eventSelect');
             evSel.innerHTML = '';
 
-            // 🛡️ 嚴格對照：如果「設定」分頁完全沒資料，才備用自動讀取 headers
             if (eventConfigs.length === 0 && rawData.length > 0) {
                 const headers = rawData[0];
                 for (let c = 3; c < headers.length; c++) {
@@ -502,8 +552,18 @@
     function checkHighRisk(memberRow) {
         const headers = rawData[0] || [];
         let leaveCount = 0;
+
+        const validEventNames = eventConfigs.map(e => e.name.trim());
+
         for (let c = headers.length - 1; c >= 3; c--) {
+            const headerName = (headers[c] || "").toString().trim();
+            
+            if (!validEventNames.includes(headerName)) {
+                continue;
+            }
+
             const val = (memberRow[c] || "").toString().trim();
+
             if (val === "請假" || val === "不參加") {
                 leaveCount++;
                 if (leaveCount >= 3) return true;
