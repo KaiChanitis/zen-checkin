@@ -242,10 +242,10 @@
 
         .loading-overlay { text-align: center; padding: 40px; color: var(--text-light); font-size: 14px; }
 
-        /* 🌟 浮動一鍵回頂部按鈕 (Back to Top) */
+        /* 🔝 浮動一鍵回頂部按鈕 */
         .back-to-top {
             position: fixed;
-            bottom: 85px; /* 位於底部選單上方 */
+            bottom: 85px;
             right: 20px;
             width: 44px;
             height: 44px;
@@ -327,7 +327,7 @@
     </div>
 </div>
 
-<!-- 🌟 浮動一鍵回頂部按鈕 -->
+<!-- 🔝 浮動一鍵回頂部按鈕 -->
 <button id="backToTopBtn" class="back-to-top" onclick="scrollToTop()">▲</button>
 
 <!-- 底部固定選單 -->
@@ -364,7 +364,7 @@
     let eventConfigs = [];
     let currentTab = 1;
 
-    // 🌟 懸浮按鈕滾動監聽邏輯
+    // 懸浮按鈕滾動監聽
     window.onscroll = function() {
         const topBtn = document.getElementById("backToTopBtn");
         if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
@@ -549,18 +549,14 @@
         }
     }
 
+    // 🌟 連續請假判定：從最新（右側）往前看，只要最新這一段連續 3 次為「請假/不參加」即觸發；中間只要有一次「出席」就會歸零重新計算。
     function checkHighRisk(memberRow) {
         const headers = rawData[0] || [];
         let leaveCount = 0;
 
-        const validEventNames = eventConfigs.map(e => e.name.trim());
-
         for (let c = headers.length - 1; c >= 3; c--) {
             const headerName = (headers[c] || "").toString().trim();
-            
-            if (!validEventNames.includes(headerName)) {
-                continue;
-            }
+            if (!headerName) continue;
 
             const val = (memberRow[c] || "").toString().trim();
 
@@ -568,6 +564,7 @@
                 leaveCount++;
                 if (leaveCount >= 3) return true;
             } else if (val !== "") {
+                // 遇到出席，連續請假中斷，跳出循環
                 break; 
             }
         }
